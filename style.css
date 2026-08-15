@@ -1,4 +1,4 @@
-/* Logo: readable, not oversized */
+/* Logo sizing */
 img[src*="/logo/"] {
   height: 28px !important;
   width: auto !important;
@@ -12,15 +12,21 @@ img[src*="/logo/"] {
   display: none !important;
 }
 
-/* Softer modern type rhythm on Maple */
+/* Flat page canvas — no residual glow overlays if theme injects them */
+html,
+body {
+  background-image: none !important;
+}
+
+/* Reading rhythm with brand Jost */
 #content-area {
-  letter-spacing: -0.011em;
+  letter-spacing: -0.01em;
 }
 
 #content-area h1,
 #content-area h2,
 #content-area h3 {
-  letter-spacing: -0.022em;
+  letter-spacing: -0.015em;
   font-weight: 600;
 }
 

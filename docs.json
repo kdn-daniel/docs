@@ -58,13 +58,13 @@
     "default": "system"
   },
   "fonts": {
-    "family": "Plus Jakarta Sans",
+    "family": "Jost",
     "heading": {
-      "family": "Plus Jakarta Sans",
+      "family": "Jost",
       "weight": 600
     },
     "body": {
-      "family": "Plus Jakarta Sans",
+      "family": "Jost",
       "weight": 400
     }
   },
@@ -74,8 +74,5 @@
   "styling": {
     "eyebrows": "breadcrumbs",
     "codeblocks": "system"
-  },
-  "background": {
-    "decoration": "gradient"
   }
 }
