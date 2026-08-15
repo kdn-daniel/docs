@@ -97,11 +97,17 @@ body {
   line-height: 1.7;
 }
 
-/* Cards de “Más información” (ADRES / entidades): más grandes y claras */
+/* Cards de “Más información”: una debajo de otra, misma altura */
+.result-info-cards > * {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
 .result-info-cards a,
 .result-info-cards [href] {
-  min-height: 11.5rem;
-  padding: 1.35rem 1.25rem !important;
+  min-height: 7.5rem;
+  padding: 1.2rem 1.25rem !important;
 }
 
 .result-info-cards h3,
