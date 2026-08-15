@@ -1,0 +1,120 @@
+---
+title: "Persona natural"
+sidebarTitle: "Persona natural"
+description: "Consulta de antecedentes de persona natural: documentos, fuentes e informe."
+icon: "user"
+---
+
+Usa el [POST del servicio](/consulta-antecedentes) con tipo y número de documento. Las fuentes de persona natural se consultan juntas en esa solicitud.
+
+<Info>
+  Flujo, créditos, omitidas y errores HTTP están en [Consulta de antecedentes](/consulta-antecedentes).
+</Info>
+
+## Request
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "FechaExpedicionDocumentoIdentidad": "17/12/2009"
+      }
+    ]
+  }'
+```
+
+### Campos
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `Consultas[].TipoDocumentoIdentificacion` | string | Sí | Código del tipo de documento |
+| `Consultas[].NumeroIdentificacion` | string | Sí | Solo dígitos `0-9` |
+| `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite |
+
+<Note>
+  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero las fuentes que la requieren no se consultan.
+</Note>
+
+## Tipos de documento
+
+| Código | Nombre |
+| --- | --- |
+| `CC` | Cédula de Ciudadanía |
+| `CE` | Cédula de Extranjería |
+| `TI` | Tarjeta de Identidad |
+| `RC` | Registro Civil |
+| `PA` | Pasaporte |
+| `CD` | Carné Diplomático |
+| `PEP` | Permiso Especial de Permanencia |
+| `PE` | Permiso Especial |
+| `PT` | Protección Temporal |
+| `PPT` | Permiso por Protección Temporal |
+
+## Resultado
+
+Cuando el ítem está `completado` pueden venir `PorcentajeConfianza`, `TieneHallazgos`, `RequiereRevision`, `InformePdf` y `Fuentes`.
+
+```json
+{
+  "TipoDocumentoIdentificacion": "CC",
+  "NumeroIdentificacion": "1020304050",
+  "NombreCompleto": "Sin identificar",
+  "Estado": "completado",
+  "PorcentajeConfianza": 95,
+  "TieneHallazgos": true,
+  "EstadoInforme": "listo",
+  "InformePdf": "https://…",
+  "Fuentes": [
+    {
+      "Nombre": "…",
+      "Categoria": "Judicial",
+      "Estado": "completado",
+      "TieneNovedad": false,
+      "Nivel": "sin novedad",
+      "Mensaje": "Sin antecedentes judiciales",
+      "Evidencias": [
+        {
+          "Titulo": "Evidencia",
+          "Url": "https://…"
+        }
+      ]
+    }
+  ]
+}
+```
+
+`EstadoInforme`: `pendiente` \| `generando` \| `listo` \| `error`.
+
+`PorcentajeConfianza` va de 0 a 100. Es un indicador consolidado; no reemplaza leer `Fuentes` ni el informe.
+
+### Fuentes
+
+| Campo | Significado |
+| --- | --- |
+| `Nombre` | Fuente consultada |
+| `Categoria` | Clasificación de esa fuente |
+| `Estado` | `completado` \| `procesando` \| `indisponible` |
+| `TieneNovedad` | Si hubo novedad |
+| `Nivel` | Nivel del hallazgo |
+| `Mensaje` | Texto corto |
+| `Evidencias` | Lista `{ Titulo, Url }` |
+
+<div className="result-info-cards">
+  <CardGroup cols={2}>
+    <Card title="Cómo leer el resultado" icon="book-open">
+      Qué significan confianza, hallazgos, niveles y el informe. El detalle está en la web de ECORPA.
+    </Card>
+    <Card title="Fuentes" icon="list">
+      Qué fuentes se consultan. El listado está en la web de ECORPA.
+    </Card>
+    <Card title="Fuentes que requieren fecha de expedición" icon="calendar">
+      `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, esas fuentes no se consultan. Cuáles la piden está en la web de ECORPA.
+    </Card>
+  </CardGroup>
+</div>

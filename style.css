@@ -37,8 +37,9 @@ ul.sidebar-group a svg {
   height: 1.05rem !important;
 }
 
-/* Entidades (ADRES, etc.) un nivel más adentro que el servicio */
-li[id^="/consultas-seguridad-social/"] > a {
+/* Tipos de consulta (ADRES, persona natural, etc.) un nivel más adentro */
+li[id^="/consultas-seguridad-social/"] > a,
+li[id^="/consulta-antecedentes/"] > a {
   margin-left: 2.15rem !important;
   padding-left: 1rem !important;
   width: calc(100% - 3.15rem) !important;

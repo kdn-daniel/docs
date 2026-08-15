@@ -40,7 +40,8 @@
         "pages": [
           "consultas-seguridad-social",
           "consultas-seguridad-social/adres",
-          "consulta-antecedentes"
+          "consulta-antecedentes",
+          "consulta-antecedentes/persona-natural"
         ]
       }
     ]
