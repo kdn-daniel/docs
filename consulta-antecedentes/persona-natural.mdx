@@ -47,14 +47,13 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
 | --- | --- |
 | `CC` | Cédula de Ciudadanía |
 | `CE` | Cédula de Extranjería |
-| `TI` | Tarjeta de Identidad |
-| `RC` | Registro Civil |
 | `PA` | Pasaporte |
-| `CD` | Carné Diplomático |
 | `PEP` | Permiso Especial de Permanencia |
 | `PE` | Permiso Especial |
-| `PT` | Protección Temporal |
-| `PPT` | Permiso por Protección Temporal |
+
+<Note>
+  No todas las fuentes aceptan todos los tipos. El detalle de qué documento aplica en cada fuente está en la web de ECORPA. [Más información](https://ecorpa.com)
+</Note>
 
 ## Resultado
 
@@ -119,6 +118,11 @@ Cuando el ítem está `completado` pueden venir `PorcentajeConfianza`, `TieneHal
     </Card>
     <Card title="Fuentes que requieren fecha de expedición" icon="calendar" href="https://ecorpa.com">
       Si no envías `FechaExpedicionDocumentoIdentidad`, esas fuentes no se consultan.
+
+      **Más información →**
+    </Card>
+    <Card title="Tipos de documento por fuente" icon="id-card" href="https://ecorpa.com">
+      No todas las fuentes consultan todos los tipos de documento.
 
       **Más información →**
     </Card>
