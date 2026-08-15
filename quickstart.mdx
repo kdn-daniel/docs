@@ -1,37 +1,37 @@
 ---
 title: "Empezar"
 sidebarTitle: "Empezar"
-description: "Checklist corto para tu primera integración con las APIs ECORPA."
+description: "Checklist para tu primera integración con las APIs ECORPA."
 icon: "rocket"
 ---
 
-Antes de pegarle a un producto, asegúrate de esto:
+Antes de llamar un producto, revisa esto:
 
 <Steps>
-  <Step title="Ten tu API Key a la mano">
-    Debe empezar por `ecorpa_key_…` y traer los scopes de los productos que contrataste.
+  <Step title="API Key">
+    Debe empezar por `ecorpa_key_…` y tener los scopes contratados.
   </Step>
-  <Step title="Arma el header">
-    En todas las llamadas: `Authorization: Bearer ecorpa_key_…`. En los `POST`, también `Content-Type: application/json`.
+  <Step title="Header">
+    Siempre `Authorization: Bearer ecorpa_key_…`. En `POST`, también `Content-Type: application/json`.
   </Step>
-  <Step title="Usa la URL base">
+  <Step title="URL base">
     ```text
     https://apis.ecorpa.com/v2
     ```
   </Step>
-  <Step title="Elige el producto">
-    Cada uno tiene su path (`/consulta/seguridad_social`, `/consulta/antecedentes`, `/formularios/afiliacion`, `/afiliaciones/seguridad_social`). Las guías detalladas las vamos publicando aquí.
+  <Step title="Producto">
+    Path según el caso (`/consulta/seguridad_social`, `/consulta/antecedentes`, `/formularios/afiliacion`, `/afiliaciones/seguridad_social`).
   </Step>
-  <Step title="POST y después GET">
-    Creas la solicitud, guardas `Data.IdSolicitud` y consultas el estado hasta que termine.
+  <Step title="POST → GET">
+    Creas la solicitud, guardas `Data.IdSolicitud` y consultas el estado hasta terminar.
   </Step>
 </Steps>
 
-## Probar que la key responde
+## Probar la key
 
 ```bash
 curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicitud}" \
   -H "Authorization: Bearer ecorpa_key_xxxxxxxx" | jq .
 ```
 
-Si aún no tienes un `IdSolicitud`, empieza por [Autenticación](/authentication) y luego por la guía del producto que vayas a usar.
+Si aún no tienes un `IdSolicitud`, empieza por [Autenticación](/authentication) y luego la guía del producto.

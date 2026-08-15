@@ -1,10 +1,10 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "ECORPA",
-  "theme": "maple",
+  "theme": "willow",
   "colors": {
     "primary": "#09aff4",
-    "light": "#09aff4",
+    "light": "#3bc4f8",
     "dark": "#0d1857"
   },
   "favicon": "/favicon.png",
@@ -50,20 +50,29 @@
   },
   "description": "Documentación de las APIs de ECORPA para integradores.",
   "logo": {
-    "light": "/logo/light.png",
-    "dark": "/logo/dark.png",
+    "light": "/logo/dark.png",
+    "dark": "/logo/light.png",
     "href": "https://ecorpa.com"
   },
   "appearance": {
-    "default": "light"
-  },
-  "background": {
-    "decoration": "gradient"
+    "default": "system"
   },
   "fonts": {
-    "family": "Jost"
+    "family": "Plus Jakarta Sans",
+    "heading": {
+      "family": "Plus Jakarta Sans",
+      "weight": 600
+    },
+    "body": {
+      "family": "Plus Jakarta Sans",
+      "weight": 400
+    }
   },
   "icons": {
     "library": "lucide"
+  },
+  "styling": {
+    "eyebrows": "breadcrumbs",
+    "codeblocks": "dark"
   }
 }

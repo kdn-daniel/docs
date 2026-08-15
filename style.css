@@ -1,6 +1,39 @@
-/* Hide bottom floating Ask bar; keep top search / assistant entry. */
+/* Logo sizing — keep wordmark readable without dominating the navbar */
+img[src*="/logo/"] {
+  height: 28px !important;
+  width: auto !important;
+  max-width: 160px !important;
+}
+
+/* Hide bottom floating Ask bar; keep top search / assistant */
 #chat-assistant-floating-input,
 .chat-assistant-floating-input,
 [data-component-name="chat-assistant-floating-input"] {
   display: none !important;
+}
+
+/* Calmer reading rhythm */
+#content-area {
+  letter-spacing: -0.011em;
+}
+
+#content-area h1,
+#content-area h2,
+#content-area h3 {
+  letter-spacing: -0.02em;
+  font-weight: 600;
+}
+
+#content-area p,
+#content-area li {
+  line-height: 1.7;
+}
+
+#content-area h2 {
+  margin-top: 2.25rem;
+}
+
+/* Slightly quieter cards / tables */
+#content-area table {
+  font-size: 0.95em;
 }

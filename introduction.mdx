@@ -1,11 +1,11 @@
 ---
 title: "Introducción"
 sidebarTitle: "Introducción"
-description: "Qué APIs ofrece ECORPA, cuál es la URL base y cómo funciona el flujo asíncrono."
+description: "Productos ECORPA, URL base y flujo asíncrono."
 icon: "book-open"
 ---
 
-Con las APIs de ECORPA puedes **consultar**, **generar formularios** y **radicar afiliaciones** de seguridad social en Colombia. Te autenticas con una API Key y trabajas por solicitud: envías un lote, recibes un `IdSolicitud` y luego consultas el resultado.
+Las APIs de ECORPA te permiten **consultar**, **generar formularios** y **radicar afiliaciones** de seguridad social en Colombia. Te autenticas con una API Key y trabajas por solicitud: envías un lote, recibes un `IdSolicitud` y consultas el resultado.
 
 ## Productos
 
@@ -16,33 +16,29 @@ Con las APIs de ECORPA puedes **consultar**, **generar formularios** y **radicar
 | Formularios de afiliación | `/v2/formularios/afiliacion` | `formularios_afiliacion` |
 | Afiliaciones seguridad social | `/v2/afiliaciones/seguridad_social` | `afiliaciones_seguridad_social` |
 
-Cada producto tendrá su propia guía en esta documentación.
-
 ## URL base
 
 ```text
 https://apis.ecorpa.com/v2
 ```
 
-## Cómo funciona
-
-En casi todos los productos el flujo es el mismo:
+## Flujo
 
 <Steps>
-  <Step title="Autentícate">
-    Incluye tu key en el header: `Authorization: Bearer ecorpa_key_…`, con el scope del producto que vas a usar.
+  <Step title="Autenticar">
+    Header `Authorization: Bearer ecorpa_key_…` con el scope del producto.
   </Step>
-  <Step title="Crea la solicitud">
-    Haz un `POST` con uno o varios registros. Si todo cuadra, te devolvemos un `IdSolicitud`.
+  <Step title="Crear solicitud">
+    `POST` con uno o varios registros. Respuesta con `IdSolicitud`.
   </Step>
-  <Step title="Consulta el resultado">
-    Con un `GET` a `…/{IdSolicitud}` revisas el avance hasta que cada ítem termine (`procesado`, `error`, etc.).
+  <Step title="Consultar resultado">
+    `GET …/{IdSolicitud}` hasta que cada ítem termine (`procesado`, `error`, etc.).
   </Step>
 </Steps>
 
-## Cómo respondemos
+## Formato de respuesta
 
-Las respuestas van en **PascalCase** y siempre traen este sobre:
+Las respuestas van en **PascalCase**:
 
 ```json
 {
@@ -52,4 +48,4 @@ Las respuestas van en **PascalCase** y siempre traen este sobre:
 }
 ```
 
-Cuando quieras, sigue con [Autenticación](/authentication) para ver cómo armar el header y los scopes.
+Siguiente: [Autenticación](/authentication).

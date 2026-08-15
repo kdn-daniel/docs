@@ -5,36 +5,33 @@ description: "Documentación de las APIs de ECORPA para integradores."
 icon: "house"
 ---
 
-Bienvenido a la documentación de las **APIs ECORPA**. Aquí encuentras lo necesario para autenticarte, elegir el producto correcto y hacer tu primera llamada.
+Documentación de las **APIs ECORPA**: autenticación, URL base y el flujo para crear y consultar solicitudes.
 
 <CardGroup cols={2}>
   <Card title="Introducción" icon="book-open" href="/introduction">
-    Qué APIs ofrece ECORPA, URL base y cómo funciona el flujo asíncrono.
+    Productos, URL base y flujo asíncrono.
   </Card>
-
   <Card title="Autenticación" icon="key-round" href="/authentication">
-    Cómo usar tu API Key con el header Bearer y qué scopes necesitas.
+    API Key, header Bearer y scopes.
   </Card>
-
   <Card title="Empezar" icon="rocket" href="/quickstart">
-    Checklist corto para tu primera integración.
+    Checklist para tu primera llamada.
   </Card>
-
   <Card title="Ir a la App" icon="layout-dashboard" href="https://app.ecorpa.com">
-    Genera o revisa tus API Keys en el panel de ECORPA.
+    Genera o revisa tus API Keys.
   </Card>
 </CardGroup>
 
-## Por dónde empezar
+## Flujo rápido
 
 <Steps>
-  <Step title="Consigue tu API Key">
-    Entra a [app.ecorpa.com](https://app.ecorpa.com), ve a **Configuración → API Keys** y genera una key con los scopes del producto que vas a consumir.
+  <Step title="API Key">
+    En [app.ecorpa.com](https://app.ecorpa.com) → **Configuración → API Keys**, con los scopes del producto.
   </Step>
-  <Step title="Lee Autenticación y Empezar">
-    Revisa el header `Authorization: Bearer …` y el checklist de [Empezar](/quickstart) para validar que la key responde.
+  <Step title="Header">
+    `Authorization: Bearer ecorpa_key_…` en todas las llamadas. Detalle en [Autenticación](/authentication).
   </Step>
-  <Step title="Integra el producto">
-    Cuando estés listo, usa la URL base `https://apis.ecorpa.com/v2` y el endpoint del producto que necesites.
+  <Step title="Integrar">
+    Base `https://apis.ecorpa.com/v2` + path del producto. Checklist en [Empezar](/quickstart).
   </Step>
 </Steps>

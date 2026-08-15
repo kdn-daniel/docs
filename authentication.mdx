@@ -1,11 +1,11 @@
 ---
 title: "Autenticación"
 sidebarTitle: "Autenticación"
-description: "Cómo usar tu API Key de ECORPA: header Bearer, scopes y qué hacer si algo falla."
+description: "API Key, header Bearer, scopes y errores comunes."
 icon: "key-round"
 ---
 
-Para llamar las APIs de integración solo necesitas tu **API Key**. No envíes `UserId` ni `CorreoCliente` en el body: con la key ya sabemos quién eres.
+Para las APIs de integración basta tu **API Key**. No envíes `UserId` ni `CorreoCliente` en el body: con la key ya te identificamos.
 
 ## Header
 
@@ -14,11 +14,11 @@ Authorization: Bearer ecorpa_key_xxxxxxxx
 Content-Type: application/json
 ```
 
-- Tu key empieza por `ecorpa_key_…`
-- Te la entregamos al activar la integración
-- Guárdala en el backend o en un gestor de secretos. Nunca en el front ni en un repo público
+- Empieza por `ecorpa_key_…`
+- Se entrega al activar la integración
+- Solo en backend o gestor de secretos — nunca en front ni en repos públicos
 
-## Ejemplo rápido
+## Ejemplo
 
 ```bash
 curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicitud}" \
@@ -27,7 +27,7 @@ curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicit
 
 ## Scopes
 
-Cada producto pide su propio permiso. Si la key no lo tiene, la llamada no pasa.
+Cada producto exige su permiso. Sin él, la llamada no pasa.
 
 | Producto | Scope |
 | --- | --- |
@@ -36,20 +36,20 @@ Cada producto pide su propio permiso. Si la key no lo tiene, la llamada no pasa.
 | Formularios de afiliación | `formularios_afiliacion` |
 | Afiliaciones seguridad social | `afiliaciones_seguridad_social` |
 
-## Si algo falla al autenticar
+## Errores de auth
 
-| HTTP | Qué suele pasar |
+| HTTP | Qué significa |
 | --- | --- |
-| `401` | Falta la key, está mal escrita o ya no es válida |
-| `403` | La key sirve, pero no tiene permiso para ese producto |
+| `401` | Falta la key, está mal o ya no es válida |
+| `403` | La key existe, pero sin permiso para ese producto |
 
 ## Buenas prácticas
 
 <Warning>
-  No pongas la API Key en JavaScript del navegador, en apps móviles ni en repositorios públicos.
+  No expongas la API Key en el navegador, apps móviles ni repositorios públicos.
 </Warning>
 
-- Cárgala desde una variable de entorno (por ejemplo `ECORPA_API_KEY`)
-- Si se filtró, rótala de una vez
-- Pide solo los scopes que realmente uses
-- Revoca las keys que ya no necesites
+- Variable de entorno, p. ej. `ECORPA_API_KEY`
+- Si se filtró, rótala de inmediato
+- Pide solo los scopes que uses
+- Revoca keys que ya no necesites
