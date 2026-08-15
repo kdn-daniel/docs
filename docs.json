@@ -1,7 +1,7 @@
 {
   "$schema": "https://mintlify.com/docs.json",
   "name": "ECORPA",
-  "theme": "willow",
+  "theme": "maple",
   "colors": {
     "primary": "#09aff4",
     "light": "#3bc4f8",
@@ -73,6 +73,9 @@
   },
   "styling": {
     "eyebrows": "breadcrumbs",
-    "codeblocks": "dark"
+    "codeblocks": "system"
+  },
+  "background": {
+    "decoration": "gradient"
   }
 }
