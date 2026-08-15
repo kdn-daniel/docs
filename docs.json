@@ -20,6 +20,17 @@
         "icon": "layout-dashboard",
         "href": "https://app.ecorpa.com"
       }
+    ],
+    "tabs": [
+      {
+        "tab": "Guía",
+        "pages": [
+          "index",
+          "introduction",
+          "authentication",
+          "quickstart"
+        ]
+      }
     ]
   },
   "navbar": {
