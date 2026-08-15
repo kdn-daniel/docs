@@ -1,0 +1,103 @@
+---
+title: "EcoRPA API Authentication: Secure Requests with API Keys"
+sidebarTitle: "Authentication"
+description: "Learn how to obtain and use API keys to authenticate requests to the EcoRPA API, including header format and security best practices."
+---
+
+EcoRPA authenticates API requests using API keys passed as Bearer tokens in the `Authorization` header. Every request your application makes to the EcoRPA API must include a valid API key — requests without one, or with an invalid or revoked key, will be rejected with an authentication error. There are no session cookies or OAuth flows required; a single header is all it takes.
+
+## Obtaining an API Key
+
+You manage your API keys from the EcoRPA dashboard. Follow these steps to generate one:
+
+1. Log in to your account at [app.ecorpa.com](https://app.ecorpa.com).
+2. Navigate to **Settings → API Keys** in the left sidebar.
+3. Click **Generate New Key**, enter a descriptive name (for example, `production-backend` or `dev-local`), and select the scopes your application needs.
+4. Click **Create** and immediately copy the key that appears — for security reasons, EcoRPA will not display the full key again after you close the dialog.
+
+Store your API key in a secure location such as a secrets manager or an encrypted environment variable store before closing the dialog.
+
+## Using Your API Key
+
+Pass your API key in the `Authorization` header of every HTTP request using the `Bearer` scheme:
+
+```bash
+curl -H "Authorization: Bearer YOUR_API_KEY" \
+     https://api.ecorpa.com/v1/workflows
+```
+
+The following examples show how to include the header in the most common languages and tools.
+
+<CodeGroup>
+
+```bash curl
+curl -X GET https://api.ecorpa.com/v1/workflows \
+  -H "Authorization: Bearer YOUR_API_KEY" \
+  -H "Content-Type: application/json"
+```
+
+```python Python
+import requests
+
+api_key = "YOUR_API_KEY"
+
+response = requests.get(
+    "https://api.ecorpa.com/v1/workflows",
+    headers={
+        "Authorization": f"Bearer {api_key}",
+        "Content-Type": "application/json",
+    },
+)
+
+print(response.json())
+```
+
+```javascript JavaScript
+const apiKey = "YOUR_API_KEY";
+
+const response = await fetch("https://api.ecorpa.com/v1/workflows", {
+  method: "GET",
+  headers: {
+    Authorization: `Bearer ${apiKey}`,
+    "Content-Type": "application/json",
+  },
+});
+
+const data = await response.json();
+console.log(data);
+```
+
+</CodeGroup>
+
+## API Key Scopes
+
+When you generate an API key, you assign it one or more scopes that control which actions it can perform. Always choose the minimum scopes your application actually needs.
+
+| Scope | Description |
+|---|---|
+| `read` | Read-only access to all resources — workflows, tasks, integrations, and logs. |
+| `write` | Create, update, and delete resources. Includes all `read` permissions. |
+| `admin` | Full administrative access, including managing API keys, users, and account settings. Includes all `write` permissions. |
+
+## Security Best Practices
+
+Protecting your API keys is critical to keeping your EcoRPA account and data secure. Follow these practices to minimize risk.
+
+<Warning>
+  **Never expose your API key in client-side code.** Do not embed API keys in frontend JavaScript, mobile app binaries, or public version control repositories. Anyone who obtains your key can make authenticated requests on your behalf.
+</Warning>
+
+- **Use environment variables.** Load your API key from an environment variable (for example, `ECORPA_API_KEY`) rather than hardcoding it in your source code.
+- **Rotate keys periodically.** Generate a new API key on a regular schedule and revoke the old one. This limits the impact of a key that may have been quietly compromised.
+- **Apply minimum required scopes.** Assign only the scopes your application needs. A service that only reads data should never hold a key with `write` or `admin` scope.
+- **Revoke unused keys immediately.** If a key is no longer in use, or you suspect it has been exposed, revoke it from **Settings → API Keys** right away.
+- **Audit key usage.** Review your API key activity logs regularly from the dashboard to spot any unexpected or unauthorized requests.
+
+## Authentication Errors
+
+If a request fails due to an authentication or authorization problem, EcoRPA returns one of the following HTTP status codes.
+
+| Status Code | Reason | Resolution |
+|---|---|---|
+| `401 Unauthorized` | The API key is missing, malformed, or has been revoked. | Verify that the `Authorization: Bearer YOUR_API_KEY` header is present and that the key is valid and active in your dashboard. |
+| `403 Forbidden` | The API key is valid but does not have the scope required to perform the requested action. | Generate a new key with the appropriate scopes, or update the scopes of your existing key from **Settings → API Keys**. |

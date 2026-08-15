@@ -1,0 +1,196 @@
+---
+title: "EcoRPA API Client SDKs: Python and JavaScript Libraries"
+sidebarTitle: "SDKs"
+description: "Official and community client libraries for the EcoRPA API, with installation instructions and usage examples for Python and JavaScript."
+---
+
+EcoRPA provides official client SDKs for popular programming languages to simplify API integration. Instead of constructing raw HTTP requests, you can use these libraries to authenticate, paginate, and handle errors with minimal boilerplate — so you can focus on building your automation workflows.
+
+## Official SDKs
+
+<CardGroup cols={2}>
+  <Card title="Python SDK" icon="python">
+    Install via pip and use familiar Pythonic patterns to interact with workflows, tasks, and webhooks.
+  </Card>
+  <Card title="JavaScript / Node.js SDK" icon="js">
+    Install via npm, yarn, or pnpm and use async/await syntax to integrate EcoRPA into any Node.js application.
+  </Card>
+</CardGroup>
+
+## Python SDK
+
+### Installation
+
+Run the following command to install the EcoRPA Python SDK:
+
+```bash
+pip install ecorpa
+```
+
+### Basic Usage
+
+Import the client, initialize it with your API key, and start interacting with your workflows right away.
+
+```python
+import os
+from ecorpa import EcoRPA
+
+client = EcoRPA(api_key=os.environ["ECORPA_API_KEY"])
+
+# List workflows
+workflows = client.workflows.list()
+for workflow in workflows:
+    print(workflow.name)
+
+# Create a workflow
+new_workflow = client.workflows.create(
+    name="My Workflow",
+    description="Automated pipeline"
+)
+print(new_workflow.id)
+```
+
+### Task Creation
+
+Use the `tasks` resource to create and manage tasks within any workflow. Pass the parent workflow ID along with the task details.
+
+```python
+import os
+from ecorpa import EcoRPA
+
+client = EcoRPA(api_key=os.environ["ECORPA_API_KEY"])
+
+# Create a task inside an existing workflow
+task = client.tasks.create(
+    workflow_id="wf_abc123",
+    name="Send Notification",
+    action="notify",
+    parameters={
+        "channel": "email",
+        "recipient": "team@example.com"
+    }
+)
+
+print(f"Task created: {task.id} — Status: {task.status}")
+
+# Retrieve a specific task
+existing_task = client.tasks.get(task_id=task.id)
+print(existing_task.name)
+```
+
+### Webhook Registration
+
+Register a webhook endpoint so EcoRPA can deliver real-time event notifications to your application.
+
+```python
+import os
+from ecorpa import EcoRPA
+
+client = EcoRPA(api_key=os.environ["ECORPA_API_KEY"])
+
+# Register a new webhook
+webhook = client.webhooks.create(
+    url="https://yourapp.com/webhooks/ecorpa",
+    events=["workflow.completed", "task.failed"],
+    secret="your_signing_secret"
+)
+
+print(f"Webhook registered: {webhook.id}")
+
+# List all registered webhooks
+all_webhooks = client.webhooks.list()
+for wh in all_webhooks:
+    print(f"{wh.id}: {wh.url}")
+```
+
+---
+
+## JavaScript / Node.js SDK
+
+### Installation
+
+Choose your preferred package manager to install the EcoRPA JavaScript SDK:
+
+<CodeGroup>
+
+```bash npm
+npm install ecorpa
+```
+
+```bash yarn
+yarn add ecorpa
+```
+
+```bash pnpm
+pnpm add ecorpa
+```
+
+</CodeGroup>
+
+### Basic Usage
+
+Require the client, initialize it with your API key from an environment variable, and use `async/await` to interact with the EcoRPA API.
+
+```javascript
+const { EcoRPA } = require('ecorpa');
+
+const client = new EcoRPA({ apiKey: process.env.ECORPA_API_KEY });
+
+// List workflows
+const workflows = await client.workflows.list();
+workflows.forEach(wf => console.log(wf.name));
+
+// Create a workflow
+const workflow = await client.workflows.create({
+  name: 'My Workflow',
+  description: 'Automated pipeline'
+});
+
+console.log(`Workflow created: ${workflow.id}`);
+```
+
+### Webhook Registration
+
+Register a webhook endpoint to receive live event updates from EcoRPA. Pass the target URL, the list of events to subscribe to, and an optional signing secret.
+
+```javascript
+const { EcoRPA } = require('ecorpa');
+
+const client = new EcoRPA({ apiKey: process.env.ECORPA_API_KEY });
+
+// Register a webhook
+const webhook = await client.webhooks.create({
+  url: 'https://yourapp.com/webhooks/ecorpa',
+  events: ['workflow.completed', 'task.failed'],
+  secret: process.env.ECORPA_WEBHOOK_SECRET
+});
+
+console.log(`Webhook registered: ${webhook.id}`);
+
+// List all webhooks
+const allWebhooks = await client.webhooks.list();
+allWebhooks.forEach(wh => console.log(`${wh.id}: ${wh.url}`));
+```
+
+---
+
+## Using with Environment Variables
+
+<Tip>
+  Never hard-code your API key directly in source files. Store it in an environment variable and load it at runtime to keep your credentials secure.
+
+  Create a `.env` file in your project root:
+
+  ```bash
+  ECORPA_API_KEY=your_api_key_here
+  ECORPA_WEBHOOK_SECRET=your_webhook_secret_here
+  ```
+
+  Then load it using a library such as `python-dotenv` (Python) or `dotenv` (Node.js) before initializing the client. Make sure to add `.env` to your `.gitignore` so it is never committed to version control.
+</Tip>
+
+---
+
+## Community Libraries
+
+In addition to the official SDKs, the EcoRPA community has built and maintains client libraries for other languages and frameworks. You can find a curated list of community SDKs, along with contribution guidelines, in the [EcoRPA GitHub repository](https://github.com/ecorpa). If you have built a library you would like to share, open a pull request to add it to the community listing.

@@ -1,0 +1,284 @@
+---
+title: "Workflows API — Create, List, and Manage Workflows"
+sidebarTitle: "Workflows"
+description: "REST API endpoints for creating, listing, retrieving, updating, and deleting workflows in EcoRPA. Includes request parameters and response schemas."
+---
+
+Workflows are the core automation unit in EcoRPA. Each workflow defines a sequence of tasks that execute in response to a trigger, a schedule, or a direct API call. You can create and manage workflows programmatically using the endpoints below, giving you full control over automation logic across your organization.
+
+## The Workflow Object
+
+When you retrieve a workflow through any endpoint, EcoRPA returns a consistent JSON object with the following structure.
+
+```json
+{
+  "id": "wf_01HXYZ9ABC123DEF456GHI789",
+  "name": "Invoice Processing Pipeline",
+  "description": "Automates invoice ingestion, validation, and routing to the finance team.",
+  "status": "active",
+  "created_at": "2024-03-15T08:30:00Z",
+  "updated_at": "2024-06-01T14:22:11Z",
+  "task_count": 7
+}
+```
+
+<ResponseField name="id" type="string">
+  The unique identifier for the workflow. This value is assigned by EcoRPA at creation time and cannot be changed.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  A human-readable name for the workflow. Use a descriptive name that reflects the automation's purpose.
+</ResponseField>
+
+<ResponseField name="description" type="string">
+  An optional plain-text description of what the workflow does. This field supports up to 1,000 characters.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The current operational state of the workflow. Accepted values are `active`, `paused`, and `archived`. Only `active` workflows can be triggered or scheduled to run.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  The ISO 8601 timestamp indicating when the workflow was created.
+</ResponseField>
+
+<ResponseField name="updated_at" type="string">
+  The ISO 8601 timestamp indicating when the workflow was last modified.
+</ResponseField>
+
+<ResponseField name="task_count" type="integer">
+  The number of tasks currently associated with this workflow.
+</ResponseField>
+
+---
+
+## Endpoints
+
+<Accordion title="GET /v1/workflows — List all workflows">
+
+Retrieve a paginated list of all workflows in your EcoRPA account. Use the query parameters to filter results by status or search term.
+
+### Query Parameters
+
+<ParamField query="page" type="integer">
+  The page number to retrieve. Defaults to `1`.
+</ParamField>
+
+<ParamField query="per_page" type="integer">
+  The number of workflows to return per page. Defaults to `20`. Maximum value is `100`.
+</ParamField>
+
+<ParamField query="status" type="string">
+  Filter workflows by status. Accepted values are `active`, `paused`, and `archived`. Omit this parameter to return workflows of all statuses.
+</ParamField>
+
+<ParamField query="search" type="string">
+  A search string matched against the workflow `name` and `description` fields. Returns only workflows where at least one field contains the search term.
+</ParamField>
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/workflows?page=1&per_page=2&status=active" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "wf_01HXYZ9ABC123DEF456GHI789",
+      "name": "Invoice Processing Pipeline",
+      "description": "Automates invoice ingestion, validation, and routing to the finance team.",
+      "status": "active",
+      "created_at": "2024-03-15T08:30:00Z",
+      "updated_at": "2024-06-01T14:22:11Z",
+      "task_count": 7
+    },
+    {
+      "id": "wf_02JABC1DEF234GHI567JKL890",
+      "name": "Employee Onboarding Sequence",
+      "description": "Provisions accounts and sends welcome emails to new hires.",
+      "status": "active",
+      "created_at": "2024-04-02T10:15:00Z",
+      "updated_at": "2024-05-28T09:05:44Z",
+      "task_count": 12
+    }
+  ],
+  "meta": {
+    "current_page": 1,
+    "per_page": 2,
+    "total": 54
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="POST /v1/workflows — Create a workflow">
+
+Create a new workflow in your EcoRPA account. After creation, you can add tasks to the workflow using the Tasks API.
+
+### Body Parameters
+
+<ParamField body="name" type="string" required>
+  A human-readable name for the workflow. Must be between 1 and 255 characters.
+</ParamField>
+
+<ParamField body="description" type="string">
+  An optional description of the workflow's purpose. Supports up to 1,000 characters.
+</ParamField>
+
+<ParamField body="status" type="string">
+  The initial status of the workflow. Accepted values are `active`, `paused`, and `archived`. Defaults to `active`.
+</ParamField>
+
+### Request
+
+```bash
+curl --request POST \
+  --url "https://api.ecorpa.com/v1/workflows" \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "name": "Contract Review Automation",
+    "description": "Routes new contracts to the legal team and notifies stakeholders upon approval.",
+    "status": "active"
+  }'
+```
+
+### Response `201 Created`
+
+```json
+{
+  "data": {
+    "id": "wf_03KLMNO456PQR789STU012VWX",
+    "name": "Contract Review Automation",
+    "description": "Routes new contracts to the legal team and notifies stakeholders upon approval.",
+    "status": "active",
+    "created_at": "2024-06-15T11:00:00Z",
+    "updated_at": "2024-06-15T11:00:00Z",
+    "task_count": 0
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="GET /v1/workflows/{id} — Retrieve a workflow">
+
+Retrieve the full details of a single workflow by its unique identifier.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the workflow you want to retrieve.
+</ParamField>
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/workflows/wf_01HXYZ9ABC123DEF456GHI789" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": {
+    "id": "wf_01HXYZ9ABC123DEF456GHI789",
+    "name": "Invoice Processing Pipeline",
+    "description": "Automates invoice ingestion, validation, and routing to the finance team.",
+    "status": "active",
+    "created_at": "2024-03-15T08:30:00Z",
+    "updated_at": "2024-06-01T14:22:11Z",
+    "task_count": 7
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="PUT /v1/workflows/{id} — Update a workflow">
+
+Update one or more fields on an existing workflow. You must supply at least one body parameter. Fields you omit remain unchanged.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the workflow you want to update.
+</ParamField>
+
+### Body Parameters
+
+<ParamField body="name" type="string">
+  A new name for the workflow. Must be between 1 and 255 characters.
+</ParamField>
+
+<ParamField body="description" type="string">
+  A new description for the workflow. Supports up to 1,000 characters.
+</ParamField>
+
+<ParamField body="status" type="string">
+  The updated status for the workflow. Accepted values are `active`, `paused`, and `archived`.
+</ParamField>
+
+### Request
+
+```bash
+curl --request PUT \
+  --url "https://api.ecorpa.com/v1/workflows/wf_01HXYZ9ABC123DEF456GHI789" \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "name": "Invoice Processing Pipeline v2",
+    "status": "paused"
+  }'
+```
+
+### Response
+
+```json
+{
+  "data": {
+    "id": "wf_01HXYZ9ABC123DEF456GHI789",
+    "name": "Invoice Processing Pipeline v2",
+    "description": "Automates invoice ingestion, validation, and routing to the finance team.",
+    "status": "paused",
+    "created_at": "2024-03-15T08:30:00Z",
+    "updated_at": "2024-06-15T12:45:00Z",
+    "task_count": 7
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="DELETE /v1/workflows/{id} — Delete a workflow">
+
+Permanently delete a workflow and all of its associated tasks. This action cannot be undone. EcoRPA returns `204 No Content` on success.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the workflow you want to delete.
+</ParamField>
+
+### Request
+
+```bash
+curl --request DELETE \
+  --url "https://api.ecorpa.com/v1/workflows/wf_01HXYZ9ABC123DEF456GHI789" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response `204 No Content`
+
+EcoRPA returns an empty body with status code `204` when the workflow is successfully deleted.
+
+</Accordion>

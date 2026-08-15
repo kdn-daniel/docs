@@ -1,0 +1,212 @@
+---
+title: "EcoRPA Webhooks: Real-Time Event Notifications Guide"
+sidebarTitle: "Webhooks"
+description: "Learn how to register webhook endpoints, verify incoming signatures, and handle real-time event notifications from the EcoRPA API."
+---
+
+Webhooks let EcoRPA push event notifications to your server the moment something changes — no polling required. Whenever a workflow is created or a task completes, EcoRPA sends an HTTP `POST` request containing a structured payload to the URL you register. This makes webhooks the most efficient way to keep your systems in sync with EcoRPA in real time.
+
+## Supported Events
+
+EcoRPA emits the following events. Subscribe to only the events your integration needs to keep your endpoint focused and easy to maintain.
+
+| Event | Description |
+|---|---|
+| `workflow.created` | A new workflow was created in your account. |
+| `workflow.updated` | An existing workflow was modified (name, description, or status). |
+| `workflow.deleted` | A workflow was permanently deleted. |
+| `task.created` | A new task was added to a workflow. |
+| `task.completed` | A task finished execution successfully. |
+| `task.failed` | A task encountered an error and stopped execution. |
+
+## Registering a Webhook
+
+<Steps>
+  <Step title="Create the Webhook">
+    Send a `POST` request to `/v1/webhooks` with the URL you want EcoRPA to call and the list of events you want to receive.
+
+    ```bash
+    curl -X POST https://api.ecorpa.com/v1/webhooks \
+      -H "Authorization: Bearer $ECORPA_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "url": "https://yoursite.com/hooks",
+        "events": ["workflow.created", "task.completed"]
+      }'
+    ```
+
+    EcoRPA responds with the new webhook object, including a `secret` you will use later to verify incoming payloads:
+
+    ```json
+    {
+      "data": {
+        "id": "wh_03ab7cd8ef9g0h1i2j3k4l5m6",
+        "url": "https://yoursite.com/hooks",
+        "events": ["workflow.created", "task.completed"],
+        "secret": "whsec_a1b2c3d4e5f6...",
+        "created_at": "2024-01-15T10:00:00Z"
+      }
+    }
+    ```
+
+    Store the `secret` value securely — EcoRPA displays it only once.
+  </Step>
+
+  <Step title="Verify Your Endpoint Returns 200">
+    After registration, EcoRPA sends a verification ping to your URL. Your endpoint must respond with an HTTP `200 OK` status within 5 seconds for the registration to succeed.
+
+    ```json
+    {
+      "event": "webhook.verified",
+      "timestamp": "2024-01-15T10:00:05Z",
+      "data": {
+        "webhook_id": "wh_03ab7cd8ef9g0h1i2j3k4l5m6"
+      }
+    }
+    ```
+
+    If the verification ping fails, check that your endpoint is publicly reachable and that no firewall or authentication layer is blocking incoming requests from EcoRPA's IP ranges.
+  </Step>
+
+  <Step title="Handle the Event Payload">
+    Once verified, your endpoint starts receiving live events. Parse the JSON body, inspect the `event` field to determine the event type, and then act on the data inside the `data` object.
+
+    ```python
+    from flask import Flask, request, jsonify
+
+    app = Flask(__name__)
+
+    @app.route("/hooks", methods=["POST"])
+    def handle_webhook():
+        payload = request.get_json()
+        event_type = payload.get("event")
+
+        if event_type == "task.completed":
+            task_id = payload["data"]["id"]
+            print(f"Task {task_id} completed successfully.")
+        elif event_type == "workflow.created":
+            workflow_id = payload["data"]["id"]
+            print(f"New workflow {workflow_id} created.")
+
+        return jsonify({"received": True}), 200
+    ```
+
+    Always return `200` promptly. Move any heavy processing to a background queue.
+  </Step>
+</Steps>
+
+## Webhook Payload Format
+
+Every event EcoRPA delivers shares the same top-level structure, making it straightforward to write a single dispatcher in your handler.
+
+```json
+{
+  "event": "task.completed",
+  "timestamp": "2024-01-15T10:30:00Z",
+  "data": {
+    "id": "task_abc",
+    "workflow_id": "wf_xyz",
+    "status": "completed"
+  },
+  "signature": "sha256=3b4c5d6e7f8a9b0c1d2e3f4a5b6c7d8e9f0a1b2c3d4e5f6a7b8c9d0e1f2a3b4"
+}
+```
+
+| Field | Type | Description |
+|---|---|---|
+| `event` | string | The event type, in `resource.action` format. |
+| `timestamp` | string | ISO 8601 timestamp of when the event occurred. |
+| `data` | object | The resource that triggered the event. Schema varies by event type. |
+| `signature` | string | HMAC-SHA256 signature used to verify the payload origin. |
+
+## Verifying Webhook Signatures
+
+<Warning>
+  Always verify the `signature` field before processing any webhook payload. Skipping this step allows malicious actors to send forged requests to your endpoint and trigger unintended actions in your system.
+</Warning>
+
+EcoRPA signs every payload using HMAC-SHA256 with the `secret` returned when you registered the webhook. Recompute the signature on your server and compare it to the value in the `signature` field. Reject any request where the signatures do not match.
+
+<CodeGroup>
+
+```python Python
+import hmac
+import hashlib
+from flask import Flask, request, abort, jsonify
+
+app = Flask(__name__)
+
+WEBHOOK_SECRET = "whsec_a1b2c3d4e5f6..."  # Load from environment variable
+
+@app.route("/hooks", methods=["POST"])
+def handle_webhook():
+    raw_body = request.get_data()
+    received_signature = request.headers.get("X-EcoRPA-Signature", "")
+
+    expected_signature = "sha256=" + hmac.new(
+        WEBHOOK_SECRET.encode("utf-8"),
+        raw_body,
+        hashlib.sha256
+    ).hexdigest()
+
+    if not hmac.compare_digest(expected_signature, received_signature):
+        abort(403)
+
+    payload = request.get_json()
+    # Process payload...
+    return jsonify({"received": True}), 200
+```
+
+```javascript Node.js
+const express = require("express");
+const crypto = require("crypto");
+
+const app = express();
+const WEBHOOK_SECRET = process.env.WEBHOOK_SECRET; // Load from environment variable
+
+app.post("/hooks", express.raw({ type: "application/json" }), (req, res) => {
+  const receivedSignature = req.headers["x-ecorpa-signature"] || "";
+
+  const expectedSignature =
+    "sha256=" +
+    crypto
+      .createHmac("sha256", WEBHOOK_SECRET)
+      .update(req.body)
+      .digest("hex");
+
+  const signaturesMatch = crypto.timingSafeEqual(
+    Buffer.from(expectedSignature),
+    Buffer.from(receivedSignature)
+  );
+
+  if (!signaturesMatch) {
+    return res.status(403).send("Invalid signature");
+  }
+
+  const payload = JSON.parse(req.body);
+  // Process payload...
+  res.status(200).json({ received: true });
+});
+```
+
+</CodeGroup>
+
+Use a constant-time comparison function (`hmac.compare_digest` in Python, `crypto.timingSafeEqual` in Node.js) to prevent timing attacks.
+
+## Retry Policy
+
+If your endpoint returns a non-`2xx` status code or does not respond within 5 seconds, EcoRPA considers the delivery a failure and retries automatically. EcoRPA retries failed deliveries up to **5 times** using exponential backoff:
+
+| Attempt | Delay |
+|---|---|
+| 1st retry | 1 minute |
+| 2nd retry | 5 minutes |
+| 3rd retry | 30 minutes |
+| 4th retry | 2 hours |
+| 5th retry | 8 hours |
+
+After 5 failed attempts, EcoRPA marks the delivery as permanently failed and stops retrying. You can inspect failed deliveries and manually replay them from the [EcoRPA dashboard](https://app.ecorpa.com) under **Settings → Webhooks**.
+
+<Tip>
+  Respond with `200 OK` as quickly as possible — ideally within 1–2 seconds — and hand off any time-consuming processing to a background job or message queue. This prevents timeouts from triggering unnecessary retries and keeps your webhook delivery history clean.
+</Tip>

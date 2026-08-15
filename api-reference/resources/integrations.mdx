@@ -1,0 +1,232 @@
+---
+title: "Integrations API — Connect Third-Party Services"
+sidebarTitle: "Integrations"
+description: "REST API endpoints for listing, creating, retrieving, and deleting third-party integrations in EcoRPA, including Slack, Google Drive, and more."
+---
+
+Integrations connect EcoRPA to the external services your workflows depend on. Once you configure an integration, any workflow task can reference it to read data, post messages, create records, or trigger actions in the connected platform — without requiring you to manage credentials inside individual tasks. Use the Integrations API to set up and maintain these connections programmatically.
+
+## The Integration Object
+
+Each integration is represented by the following JSON structure.
+
+```json
+{
+  "id": "int_07UVWXY890ZAB123CDE456FGH",
+  "name": "Marketing Slack Workspace",
+  "provider": "slack",
+  "status": "connected",
+  "created_at": "2024-01-20T09:00:00Z",
+  "config": {
+    "webhook_url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX",
+    "scope": "chat:write,channels:read"
+  }
+}
+```
+
+<ResponseField name="id" type="string">
+  The unique identifier for the integration, assigned by EcoRPA at creation time.
+</ResponseField>
+
+<ResponseField name="name" type="string">
+  A human-readable label for the integration, helping you distinguish multiple connections to the same provider.
+</ResponseField>
+
+<ResponseField name="provider" type="string">
+  The third-party service this integration connects to. Accepted values are `slack`, `google_drive`, `notion`, and `jira`.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The current connectivity state of the integration. Possible values are `connected` (credentials are valid and the service is reachable), `disconnected` (the integration has been deauthorized or credentials were revoked), and `error` (EcoRPA encountered an error when last attempting to communicate with the provider).
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  The ISO 8601 timestamp indicating when the integration was created.
+</ResponseField>
+
+<ResponseField name="config" type="object" expandable>
+  A provider-specific configuration object containing the credentials and settings EcoRPA uses to communicate with the external service.
+
+  <Expandable title="config fields">
+    <ResponseField name="webhook_url" type="string">
+      The inbound webhook URL provided by the external service. Used by EcoRPA to push event data into the connected platform.
+    </ResponseField>
+    <ResponseField name="scope" type="string">
+      A comma-separated list of OAuth permission scopes granted for this integration. The available scopes depend on the provider.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+---
+
+## Endpoints
+
+<Accordion title="GET /v1/integrations — List available integrations">
+
+Retrieve a list of all integrations configured in your EcoRPA account.
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/integrations" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "int_07UVWXY890ZAB123CDE456FGH",
+      "name": "Marketing Slack Workspace",
+      "provider": "slack",
+      "status": "connected",
+      "created_at": "2024-01-20T09:00:00Z",
+      "config": {
+        "webhook_url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX",
+        "scope": "chat:write,channels:read"
+      }
+    },
+    {
+      "id": "int_08IJKLM901NOP234QRS567TUV",
+      "name": "Shared Google Drive",
+      "provider": "google_drive",
+      "status": "connected",
+      "created_at": "2024-02-14T10:30:00Z",
+      "config": {
+        "webhook_url": null,
+        "scope": "drive.readonly,drive.file"
+      }
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="POST /v1/integrations — Create an integration">
+
+Register a new integration by supplying the target provider and its configuration details. EcoRPA immediately attempts to validate the credentials and marks the integration as `connected` if successful.
+
+### Body Parameters
+
+<ParamField body="provider" type="string" required>
+  The third-party service to connect. Accepted values are `slack`, `google_drive`, `notion`, and `jira`.
+</ParamField>
+
+<ParamField body="name" type="string">
+  A human-readable label for this integration. If omitted, EcoRPA generates a default name based on the provider.
+</ParamField>
+
+<ParamField body="config" type="object" required>
+  A provider-specific JSON object containing the credentials and settings needed to connect to the external service. See the provider documentation for the required shape of this object.
+</ParamField>
+
+### Request
+
+```bash
+curl --request POST \
+  --url "https://api.ecorpa.com/v1/integrations" \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "provider": "notion",
+    "name": "Product Wiki Notion Workspace",
+    "config": {
+      "webhook_url": null,
+      "scope": "read_content,update_content",
+      "access_token": "secret_NOTION_TOKEN_HERE"
+    }
+  }'
+```
+
+### Response `201 Created`
+
+```json
+{
+  "data": {
+    "id": "int_09WXYZ012ABC345DEF678GHI",
+    "name": "Product Wiki Notion Workspace",
+    "provider": "notion",
+    "status": "connected",
+    "created_at": "2024-06-15T11:10:00Z",
+    "config": {
+      "webhook_url": null,
+      "scope": "read_content,update_content"
+    }
+  }
+}
+```
+
+<Note>
+  Sensitive values such as access tokens are accepted in the request body but are never returned in API responses. Store them securely before submitting.
+</Note>
+
+</Accordion>
+
+<Accordion title="GET /v1/integrations/{id} — Get integration details">
+
+Retrieve the full details of a single integration by its unique identifier.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the integration you want to retrieve.
+</ParamField>
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/integrations/int_07UVWXY890ZAB123CDE456FGH" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": {
+    "id": "int_07UVWXY890ZAB123CDE456FGH",
+    "name": "Marketing Slack Workspace",
+    "provider": "slack",
+    "status": "connected",
+    "created_at": "2024-01-20T09:00:00Z",
+    "config": {
+      "webhook_url": "https://hooks.slack.com/services/T00000000/B00000000/XXXXXXXXXXXXXXXXXXXX",
+      "scope": "chat:write,channels:read"
+    }
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="DELETE /v1/integrations/{id} — Remove an integration">
+
+Permanently remove an integration from your EcoRPA account. Any workflow tasks that reference this integration will fail to execute after deletion. EcoRPA returns `204 No Content` on success.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the integration you want to remove.
+</ParamField>
+
+### Request
+
+```bash
+curl --request DELETE \
+  --url "https://api.ecorpa.com/v1/integrations/int_07UVWXY890ZAB123CDE456FGH" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response `204 No Content`
+
+EcoRPA returns an empty body with status code `204` when the integration is successfully removed.
+
+</Accordion>

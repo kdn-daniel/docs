@@ -1,0 +1,151 @@
+---
+title: "Make Your First EcoRPA API Call: Step-by-Step Guide"
+sidebarTitle: "First API Call"
+description: "A complete walkthrough showing how to authenticate, call the EcoRPA API, and create your first workflow using curl or any HTTP client."
+---
+
+This guide walks you through everything you need to make your first successful EcoRPA API call. By the end, you will have authenticated with the API, created a workflow, retrieved it by ID, and updated its status — giving you a solid foundation to build any automation on top of EcoRPA.
+
+<Note>
+  Before you start, make sure you have an active EcoRPA account and a valid API key. You can generate or copy your API key from the [EcoRPA dashboard](https://app.ecorpa.com) under **Settings → API Keys**.
+</Note>
+
+<Steps>
+  <Step title="Set Up Your Environment">
+    Store your API key in an environment variable so you never hard-code credentials in your scripts or source files.
+
+    ```bash
+    export ECORPA_API_KEY=your_key_here
+    ```
+
+    Verify the variable is available in your current shell session:
+
+    ```bash
+    echo $ECORPA_API_KEY
+    ```
+
+    You should see your key printed to the terminal. From this point forward, every example in this guide reads from `$ECORPA_API_KEY`.
+  </Step>
+
+  <Step title="Test Your Connection">
+    Send a simple `GET` request to the workflows endpoint to confirm your credentials are valid and the API is reachable.
+
+    ```bash
+    curl https://api.ecorpa.com/v1/workflows \
+      -H "Authorization: Bearer $ECORPA_API_KEY"
+    ```
+
+    A successful response returns a `200 OK` status with a JSON body listing your existing workflows (empty if this is a new account):
+
+    ```json
+    {
+      "data": [],
+      "meta": {
+        "total": 0,
+        "page": 1,
+        "per_page": 20
+      }
+    }
+    ```
+
+    If you receive a `401 Unauthorized` error, double-check that your API key is correct and that the `Authorization` header is formatted exactly as shown above.
+  </Step>
+
+  <Step title="Create a Workflow">
+    Send a `POST` request to `/v1/workflows` with a name and description for your new workflow. EcoRPA returns the full workflow object, including its generated `id`.
+
+    ```bash
+    curl -X POST https://api.ecorpa.com/v1/workflows \
+      -H "Authorization: Bearer $ECORPA_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{
+        "name": "My First Workflow",
+        "description": "A test workflow created via the EcoRPA API."
+      }'
+    ```
+
+    The response includes the newly created workflow:
+
+    ```json
+    {
+      "data": {
+        "id": "wf_01hx9kq2r3n4m5p6q7s8t9u0v",
+        "name": "My First Workflow",
+        "description": "A test workflow created via the EcoRPA API.",
+        "status": "inactive",
+        "created_at": "2024-01-15T10:00:00Z",
+        "updated_at": "2024-01-15T10:00:00Z"
+      }
+    }
+    ```
+
+    Copy the `id` field — you will use it in the next two steps.
+  </Step>
+
+  <Step title="Retrieve Your Workflow">
+    Fetch the workflow you just created by passing its `id` in the URL path. Replace `{id}` with the value you copied from the previous step.
+
+    ```bash
+    curl https://api.ecorpa.com/v1/workflows/wf_01hx9kq2r3n4m5p6q7s8t9u0v \
+      -H "Authorization: Bearer $ECORPA_API_KEY"
+    ```
+
+    The API returns the full workflow object:
+
+    ```json
+    {
+      "data": {
+        "id": "wf_01hx9kq2r3n4m5p6q7s8t9u0v",
+        "name": "My First Workflow",
+        "description": "A test workflow created via the EcoRPA API.",
+        "status": "inactive",
+        "created_at": "2024-01-15T10:00:00Z",
+        "updated_at": "2024-01-15T10:00:00Z"
+      }
+    }
+    ```
+
+    Use this pattern any time you need to inspect the current state of a specific workflow.
+  </Step>
+
+  <Step title="Update Workflow Status">
+    Activate your workflow by sending a `PUT` request with the full workflow object including the updated `status` field.
+
+    ```bash
+    curl -X PUT https://api.ecorpa.com/v1/workflows/wf_01hx9kq2r3n4m5p6q7s8t9u0v \
+      -H "Authorization: Bearer $ECORPA_API_KEY" \
+      -H "Content-Type: application/json" \
+      -d '{"name": "My First Workflow", "description": "A test workflow created via the EcoRPA API.", "status": "active"}'
+    ```
+
+    The API responds with the updated workflow object:
+
+    ```json
+    {
+      "data": {
+        "id": "wf_01hx9kq2r3n4m5p6q7s8t9u0v",
+        "name": "My First Workflow",
+        "description": "A test workflow created via the EcoRPA API.",
+        "status": "active",
+        "created_at": "2024-01-15T10:00:00Z",
+        "updated_at": "2024-01-15T10:05:00Z"
+      }
+    }
+    ```
+
+    Your workflow is now active and ready to process tasks. Notice that `updated_at` reflects the time of this change.
+  </Step>
+</Steps>
+
+## Next Steps
+
+Now that you have successfully made your first EcoRPA API calls, explore these topics to continue building your integration.
+
+<CardGroup cols={2}>
+  <Card title="Webhooks" icon="bolt" href="/guides/webhooks">
+    Receive real-time event notifications whenever workflows or tasks change state in your account.
+  </Card>
+  <Card title="API Reference" icon="book-open" href="/api-reference/introduction">
+    Browse the full reference for every endpoint, request parameter, and response schema available in the EcoRPA API.
+  </Card>
+</CardGroup>

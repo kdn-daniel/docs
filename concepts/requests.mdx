@@ -1,0 +1,73 @@
+---
+title: "Making API Requests: Format, Headers, and Base URL"
+sidebarTitle: "Requests"
+description: "Learn the request format, required headers, base URL, and content-type conventions you need to construct valid EcoRPA API calls from any HTTP client."
+---
+
+Every interaction with EcoRPA happens over HTTPS using a standard REST interface. This page covers everything you need to construct a valid request: the base URL, the required headers, the expected JSON format for request and response bodies, and the HTTP methods the API supports.
+
+## Base URL
+
+All EcoRPA API endpoints share the following base URL. Append the resource path for the specific operation you want to perform.
+
+```text
+https://api.ecorpa.com/v1
+```
+
+## Required Headers
+
+Include the following headers with every request. Omitting the `Authorization` header will result in a `401 Unauthorized` response. The `Content-Type` header is required whenever you send a request body (POST, PUT, or PATCH).
+
+| Header | Value | Description |
+|---|---|---|
+| `Authorization` | `Bearer YOUR_API_KEY` | Authenticates the request using your API key. |
+| `Content-Type` | `application/json` | Required for POST, PUT, and PATCH requests that include a body. |
+| `Accept` | `application/json` | Recommended for all requests to ensure a JSON response. |
+
+## Request Format
+
+The example below shows a complete `curl` request that creates a new workflow. Use this as a template when constructing requests in your own code or HTTP client.
+
+```bash
+curl --request POST \
+  --url https://api.ecorpa.com/v1/workflows \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --header "Accept: application/json" \
+  --data '{
+    "name": "Daily Report Workflow",
+    "trigger": "schedule",
+    "cron": "0 9 * * 1-5"
+  }'
+```
+
+<Tip>
+  Store your API key in an environment variable such as `ECORPA_API_KEY` and reference it in your requests rather than hard-coding the value. This keeps your credentials out of source control and makes it easy to rotate keys without updating your code.
+</Tip>
+
+## Response Format
+
+All EcoRPA API responses return JSON. Successful responses wrap the primary resource data in a `data` field and include a `meta` object containing request-level metadata such as the unique `request_id`.
+
+```json
+{
+  "data": { ... },
+  "meta": {
+    "request_id": "abc123"
+  }
+}
+```
+
+Use the `request_id` when contacting EcoRPA support — it allows the support team to locate the exact API call in the platform logs and diagnose issues faster.
+
+## HTTP Methods
+
+EcoRPA follows standard REST conventions for HTTP methods. The table below summarizes which method to use for each type of operation.
+
+| Method | Operation | Example |
+|---|---|---|
+| `GET` | Read a resource or list resources | Retrieve a workflow by ID |
+| `POST` | Create a new resource | Create a new task |
+| `PUT` | Replace a resource entirely | Replace all workflow settings |
+| `PATCH` | Update specific fields on a resource | Update a workflow's name |
+| `DELETE` | Remove a resource | Delete an integration |

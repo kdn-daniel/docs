@@ -1,0 +1,272 @@
+---
+title: "Webhooks API — Register and Manage Event Endpoints"
+sidebarTitle: "Webhooks"
+description: "REST API endpoints for registering, listing, testing, and deleting webhook subscriptions in EcoRPA. Includes event types and payload formats."
+---
+
+Webhooks let you receive real-time notifications from EcoRPA by registering a URL that EcoRPA calls whenever a subscribed event occurs. Instead of polling the API for changes, you define an endpoint in your own infrastructure and EcoRPA delivers event payloads to it automatically. Use the Webhooks API to manage these subscriptions, verify delivery through test events, and rotate secrets for payload signature verification.
+
+## The Webhook Object
+
+Every webhook subscription is represented by the following JSON structure.
+
+```json
+{
+  "id": "whk_04PQRST567UVW890XYZ123ABC",
+  "url": "https://your-app.example.com/ecorpa/events",
+  "events": ["workflow.created", "task.completed", "task.failed"],
+  "status": "active",
+  "secret": "whsec_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+  "created_at": "2024-05-01T08:00:00Z"
+}
+```
+
+<ResponseField name="id" type="string">
+  The unique identifier for the webhook subscription, assigned by EcoRPA at creation time.
+</ResponseField>
+
+<ResponseField name="url" type="string">
+  The HTTPS endpoint to which EcoRPA delivers event payloads. Must be a valid, publicly reachable URL using the `https` scheme.
+</ResponseField>
+
+<ResponseField name="events" type="string[]">
+  An array of event type strings that this webhook is subscribed to. EcoRPA delivers a payload to the registered URL whenever one of these events occurs. See the [Supported Events](#supported-events) table below for all available values.
+</ResponseField>
+
+<ResponseField name="status" type="string">
+  The current state of the webhook subscription. Accepted values are `active` (EcoRPA delivers events to the URL) and `disabled` (delivery is paused but the subscription is retained).
+</ResponseField>
+
+<ResponseField name="secret" type="string">
+  A signing secret used to generate an HMAC-SHA256 signature for each outgoing payload. Include this value in your endpoint handler to verify that events originate from EcoRPA and have not been tampered with. This value is shown only at creation time.
+</ResponseField>
+
+<ResponseField name="created_at" type="string">
+  The ISO 8601 timestamp indicating when the webhook subscription was created.
+</ResponseField>
+
+---
+
+## Supported Events
+
+The table below lists every event type you can subscribe to when registering a webhook.
+
+| Event Type | Description |
+|---|---|
+| `workflow.created` | Fired when a new workflow is created in your account. |
+| `workflow.updated` | Fired when an existing workflow's fields are modified. |
+| `workflow.deleted` | Fired when a workflow is permanently deleted. |
+| `task.created` | Fired when a new task is added to a workflow. |
+| `task.completed` | Fired when a task finishes executing successfully. |
+| `task.failed` | Fired when a task terminates with an error. |
+
+---
+
+## Endpoints
+
+<Accordion title="GET /v1/webhooks — List webhooks">
+
+Retrieve a list of all webhook subscriptions registered in your EcoRPA account.
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/webhooks" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": [
+    {
+      "id": "whk_04PQRST567UVW890XYZ123ABC",
+      "url": "https://your-app.example.com/ecorpa/events",
+      "events": ["workflow.created", "task.completed", "task.failed"],
+      "status": "active",
+      "secret": "whsec_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+      "created_at": "2024-05-01T08:00:00Z"
+    },
+    {
+      "id": "whk_05DEFGH678IJK901LMN234OPQ",
+      "url": "https://monitoring.example.com/hooks/ecorpa",
+      "events": ["task.failed"],
+      "status": "disabled",
+      "secret": "whsec_b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4e5",
+      "created_at": "2024-05-10T12:00:00Z"
+    }
+  ],
+  "meta": {
+    "total": 2
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="POST /v1/webhooks — Register a webhook">
+
+Register a new webhook by providing the destination URL and the list of events you want to subscribe to. EcoRPA generates a signing secret at creation time and returns it in the response. Store this secret securely — it is not retrievable after the initial response.
+
+### Body Parameters
+
+<ParamField body="url" type="string" required>
+  The HTTPS endpoint that EcoRPA will deliver event payloads to. Must begin with `https://`.
+</ParamField>
+
+<ParamField body="events" type="string[]" required>
+  An array of event type strings to subscribe to. Must contain at least one value. See the [Supported Events](#supported-events) table for valid options.
+</ParamField>
+
+<ParamField body="status" type="string">
+  The initial status of the webhook. Accepted values are `active` and `disabled`. Defaults to `active`.
+</ParamField>
+
+### Request
+
+```bash
+curl --request POST \
+  --url "https://api.ecorpa.com/v1/webhooks" \
+  --header "Authorization: Bearer YOUR_API_KEY" \
+  --header "Content-Type: application/json" \
+  --data '{
+    "url": "https://your-app.example.com/ecorpa/events",
+    "events": ["workflow.created", "task.completed", "task.failed"]
+  }'
+```
+
+### Response `201 Created`
+
+```json
+{
+  "data": {
+    "id": "whk_04PQRST567UVW890XYZ123ABC",
+    "url": "https://your-app.example.com/ecorpa/events",
+    "events": ["workflow.created", "task.completed", "task.failed"],
+    "status": "active",
+    "secret": "whsec_a1b2c3d4e5f6a1b2c3d4e5f6a1b2c3d4",
+    "created_at": "2024-06-15T11:15:00Z"
+  }
+}
+```
+
+<Warning>
+  The `secret` field is returned only in this response. Copy and store it securely now. You will not be able to retrieve it again through the API.
+</Warning>
+
+</Accordion>
+
+<Accordion title="GET /v1/webhooks/{id} — Get a webhook">
+
+Retrieve the details of a single webhook subscription by its unique identifier.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the webhook you want to retrieve.
+</ParamField>
+
+### Request
+
+```bash
+curl --request GET \
+  --url "https://api.ecorpa.com/v1/webhooks/whk_04PQRST567UVW890XYZ123ABC" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": {
+    "id": "whk_04PQRST567UVW890XYZ123ABC",
+    "url": "https://your-app.example.com/ecorpa/events",
+    "events": ["workflow.created", "task.completed", "task.failed"],
+    "status": "active",
+    "secret": "whsec_••••••••••••••••••••••••••••••••",
+    "created_at": "2024-06-15T11:15:00Z"
+  }
+}
+```
+
+<Note>
+  The `secret` value is masked in retrieval responses. To rotate the secret, delete the webhook and register a new one.
+</Note>
+
+</Accordion>
+
+<Accordion title="POST /v1/webhooks/{id}/test — Send a test event">
+
+Send a synthetic test payload to the webhook's registered URL. Use this endpoint to verify that your endpoint is reachable, correctly parses the payload format, and responds with a `200` status code. EcoRPA delivers a payload with the event type `webhook.test` and a sample data body.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the webhook you want to test.
+</ParamField>
+
+### Request
+
+```bash
+curl --request POST \
+  --url "https://api.ecorpa.com/v1/webhooks/whk_04PQRST567UVW890XYZ123ABC/test" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response
+
+```json
+{
+  "data": {
+    "webhook_id": "whk_04PQRST567UVW890XYZ123ABC",
+    "event": "webhook.test",
+    "delivered_at": "2024-06-15T11:20:00Z",
+    "response_status": 200,
+    "success": true
+  }
+}
+```
+
+### Test Payload Format
+
+EcoRPA delivers the following payload to your endpoint during a test:
+
+```json
+{
+  "id": "evt_TEST_01ABCDEF1234567890",
+  "type": "webhook.test",
+  "created_at": "2024-06-15T11:20:00Z",
+  "data": {
+    "message": "This is a test event from EcoRPA.",
+    "webhook_id": "whk_04PQRST567UVW890XYZ123ABC"
+  }
+}
+```
+
+</Accordion>
+
+<Accordion title="DELETE /v1/webhooks/{id} — Delete a webhook">
+
+Permanently delete a webhook subscription. EcoRPA immediately stops delivering events to the registered URL. This action cannot be undone. EcoRPA returns `204 No Content` on success.
+
+### Path Parameters
+
+<ParamField path="id" type="string" required>
+  The unique identifier of the webhook you want to delete.
+</ParamField>
+
+### Request
+
+```bash
+curl --request DELETE \
+  --url "https://api.ecorpa.com/v1/webhooks/whk_04PQRST567UVW890XYZ123ABC" \
+  --header "Authorization: Bearer YOUR_API_KEY"
+```
+
+### Response `204 No Content`
+
+EcoRPA returns an empty body with status code `204` when the webhook is successfully deleted.
+
+</Accordion>

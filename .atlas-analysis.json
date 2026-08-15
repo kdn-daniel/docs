@@ -1,0 +1,98 @@
+{
+  "projectType": "api-service",
+  "projectName": "EcoRPA API",
+  "projectDescription": "A REST API platform providing developers with tools to automate workflows, manage resources, and integrate with external services.",
+  "theme": "luma",
+  "primaryColor": "#ef7025",
+  "lightColor": "#eec9bc",
+  "darkColor": "#4fa1ab",
+  "navigation": {
+    "tabs": [
+      {
+        "tab": "Documentation",
+        "groups": [
+          {
+            "group": "Get Started",
+            "pages": [
+              "introduction",
+              "quickstart",
+              "authentication"
+            ]
+          },
+          {
+            "group": "Core Concepts",
+            "pages": [
+              "concepts/overview",
+              "concepts/requests",
+              "concepts/errors",
+              "concepts/pagination"
+            ]
+          },
+          {
+            "group": "Guides",
+            "pages": [
+              "guides/first-api-call",
+              "guides/webhooks",
+              "guides/rate-limits",
+              "guides/best-practices"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "API Reference",
+        "groups": [
+          {
+            "group": "Overview",
+            "pages": [
+              "api-reference/introduction",
+              "api-reference/environments"
+            ]
+          },
+          {
+            "group": "Resources",
+            "pages": [
+              "api-reference/resources/workflows",
+              "api-reference/resources/tasks",
+              "api-reference/resources/integrations",
+              "api-reference/resources/webhooks"
+            ]
+          },
+          {
+            "group": "SDKs & Tools",
+            "pages": [
+              "api-reference/sdks",
+              "api-reference/changelog"
+            ]
+          }
+        ]
+      }
+    ]
+  },
+  "keyFeatures": [
+    "RESTful API with JSON responses",
+    "API key and OAuth 2.0 authentication",
+    "Webhook event notifications",
+    "Workflow automation endpoints",
+    "Task and resource management",
+    "Third-party integrations",
+    "Rate limiting with clear headers",
+    "Paginated list responses"
+  ],
+  "publicApiSurface": [
+    "GET /workflows",
+    "POST /workflows",
+    "GET /workflows/{id}",
+    "PUT /workflows/{id}",
+    "DELETE /workflows/{id}",
+    "GET /tasks",
+    "POST /tasks",
+    "GET /tasks/{id}",
+    "PATCH /tasks/{id}",
+    "GET /integrations",
+    "POST /integrations",
+    "GET /webhooks",
+    "POST /webhooks",
+    "DELETE /webhooks/{id}"
+  ]
+}

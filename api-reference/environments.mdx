@@ -1,0 +1,97 @@
+---
+title: "EcoRPA API Environments: Production and Sandbox Guide"
+sidebarTitle: "Environments"
+description: "Learn about EcoRPA API's production and sandbox environments, their base URLs, and how to switch between them during development and testing."
+---
+
+EcoRPA provides two fully isolated API environments — **production** and **sandbox** — so you can build and test integrations without ever touching live data. Use the sandbox throughout development and switch to production only when you are ready to go live.
+
+## Environments
+
+| Environment | Base URL | Purpose |
+|-------------|----------|---------|
+| Production | `https://api.ecorpa.com/v1` | Live data and integrations |
+| Sandbox | `https://sandbox.ecorpa.com/v1` | Testing and development |
+
+Both environments expose identical endpoints and accept the same request/response structure, so you can migrate between them by changing a single base URL value in your configuration.
+
+## Using the Sandbox
+
+The sandbox is the recommended environment for all development and QA work. Keep the following in mind when using it:
+
+- **Separate API keys** — The sandbox uses the same API key format as production, but sandbox keys are distinct credentials. Generate a dedicated sandbox key from the EcoRPA dashboard under **Settings → API Keys → Sandbox**.
+- **Isolated data** — Sandbox data is completely separate from your production account. Workflows you create, tasks you trigger, and integrations you configure in the sandbox have no effect on live systems, and no real third-party integrations are executed.
+- **No billing impact** — API calls made in the sandbox environment do not count toward your production usage quota.
+
+Define the base URL as a configuration constant in your code so you only need to change it in one place when you are ready to promote to production.
+
+<CodeGroup>
+
+```python Python
+# config.py
+ECORPA_BASE_URL = "https://sandbox.ecorpa.com/v1"
+ECORPA_API_KEY = "your_sandbox_api_key"
+```
+
+```javascript JavaScript
+// config.js
+const ECORPA_BASE_URL = "https://sandbox.ecorpa.com/v1";
+const ECORPA_API_KEY = "your_sandbox_api_key";
+```
+
+</CodeGroup>
+
+## Switching Environments
+
+To switch between sandbox and production, update the base URL and API key constants in your environment configuration. Avoid hard-coding either value inline — use environment variables or a secrets manager so the values remain outside your source code.
+
+<Tabs>
+  <Tab title="Python">
+
+```python
+# .env
+# ECORPA_ENV=sandbox
+# ECORPA_ENV=production
+
+import os
+
+ENV_URLS = {
+    "production": "https://api.ecorpa.com/v1",
+    "sandbox": "https://sandbox.ecorpa.com/v1",
+}
+
+env = os.getenv("ECORPA_ENV", "sandbox")
+base_url = ENV_URLS[env]
+api_key = os.getenv("ECORPA_API_KEY")
+
+print(f"Using EcoRPA {env} environment: {base_url}")
+```
+
+  </Tab>
+  <Tab title="JavaScript">
+
+```javascript
+// Set ECORPA_ENV=production or ECORPA_ENV=sandbox in your .env file
+
+const ENV_URLS = {
+  production: "https://api.ecorpa.com/v1",
+  sandbox: "https://sandbox.ecorpa.com/v1",
+};
+
+const env = process.env.ECORPA_ENV || "sandbox";
+const baseUrl = ENV_URLS[env];
+const apiKey = process.env.ECORPA_API_KEY;
+
+console.log(`Using EcoRPA ${env} environment: ${baseUrl}`);
+```
+
+  </Tab>
+</Tabs>
+
+<Warning>
+  Never use production API keys in development or CI environments. Exposing a production key in test pipelines risks unintended side effects on live data, real integration triggers, and potential credential leaks in build logs.
+</Warning>
+
+<Tip>
+  Use the sandbox environment for all automated testing, including unit tests, integration tests, and CI/CD pipelines. Because the sandbox is fully isolated, you can run test suites as frequently as needed without any risk of corrupting live workflows or triggering real third-party actions.
+</Tip>
