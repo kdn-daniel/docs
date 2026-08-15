@@ -70,7 +70,11 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
 | `Consultas` | array | Sí | Mínimo 1, máximo **100** documentos |
 | `Consultas[].TipoDocumentoIdentificacion` | string | Sí | Código del tipo de documento |
 | `Consultas[].NumeroIdentificacion` | string | Sí | Solo dígitos `0-9` |
-| `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite |
+| `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite. Sin este dato, algunas fuentes no se consultan |
+
+<Note>
+  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero **algunas fuentes no se consultan**. Otras no la necesitan. El listado de fuentes y cuáles piden la fecha está en la web de ECORPA.
+</Note>
 
 <Accordion title="Texto que respalda AceptarTerminos">
   Al enviar `AceptarTerminos: true`, declaras:
@@ -219,11 +223,12 @@ Si `InformePdf` o una evidencia deja de funcionar, vuelve a llamar el `GET`.
 `PorcentajeConfianza` va de 0 a 100. Es un indicador consolidado; no reemplaza leer `Fuentes` ni el informe.
 
 <div className="result-info-cards">
-  <CardGroup cols={1}>
-    <Card title="Cómo leer el resultado" icon="book-open" href="https://ecorpa.com">
-      Qué significan confianza, hallazgos, niveles y el informe.
-
-      **Más información →**
+  <CardGroup cols={2}>
+    <Card title="Cómo leer el resultado" icon="book-open">
+      Qué significan confianza, hallazgos, niveles y el informe. El detalle está en la web de ECORPA.
+    </Card>
+    <Card title="Fuentes y fecha de expedición" icon="calendar">
+      Sin `FechaExpedicionDocumentoIdentidad` no se consultan algunas fuentes. Cuáles la piden, cuáles no y el listado de fuentes está en la web de ECORPA.
     </Card>
   </CardGroup>
 </div>
