@@ -41,7 +41,11 @@
           "consultas-seguridad-social",
           "consultas-seguridad-social/adres",
           "consulta-antecedentes",
-          "consulta-antecedentes/persona-natural"
+          "consulta-antecedentes/persona-natural",
+          "formularios-afiliacion",
+          "formularios-afiliacion/eps",
+          "formularios-afiliacion/ccf",
+          "formularios-afiliacion/eps-ccf"
         ]
       }
     ]

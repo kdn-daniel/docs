@@ -1,0 +1,71 @@
+---
+title: "EPS y CCF"
+sidebarTitle: "EPS y CCF"
+description: "Formularios de afiliación EPS y CCF en la misma solicitud."
+icon: "layers"
+---
+
+Usa `Entidad: "formularios_eps_ccf"` con `CodigoEntidadEps` y `CodigoEntidadCcf` en cada registro.
+
+<Info>
+  Campos comunes, crear, actualizar y GET están en [Formularios de afiliación](/formularios-afiliacion).
+</Info>
+
+## Request
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/formularios/afiliacion" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "formularios_eps_ccf",
+    "EnviarCorreo": true,
+    "FirmaTrabajador": true,
+    "FirmaCliente": true,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "Genero": "MAS",
+        "CodigoNacionalidad": "170",
+        "CodigoPaisNacimiento": "170",
+        "FechaNacimiento": "11/05/1997",
+        "CodigoDaneCiudadNacimiento": "11001",
+        "FechaIngreso": "03/08/2026",
+        "Afp": "PROTECCION S.A.",
+        "Arl": "COLPATRIA",
+        "Ibc": "1750905",
+        "DireccionResidencia": "CALLE 1 # 2-3",
+        "Celular": "3001234567",
+        "CorreoElectronico": "ejemplo@correo.com",
+        "CodigoDaneCiudadResidencia": "11001",
+        "BarrioResidencia": "CENTRO",
+        "CodigoDaneCiudadLabor": "11001",
+        "DireccionLabor": "CALLE 4 # 5-6",
+        "BarrioLabor": "CENTRO",
+        "NitEmpresa": "900123456",
+        "Cargo": "AUXILIAR",
+        "FechaExpedicionDocumentoIdentidad": "19/05/2015",
+        "CodigoDaneCiudadExpedicionDocumentoIdentidad": "11001",
+        "NumeroContrato": "CTR1020304050",
+        "FechaRetiroUltimoContrato": "",
+        "CodigoEntidadEps": "EPS037",
+        "CodigoEntidadCcf": "CCF22"
+      }
+    ]
+  }'
+```
+
+En el GET, `Formularios[]` puede traer `Tipo: "EPS"` y `Tipo: "CCF"`.
+
+<div className="result-info-cards">
+  <CardGroup cols={1}>
+    <Card title="Códigos EPS, CCF y catálogos" icon="book-open" href="https://ecorpa.com">
+      Códigos de EPS y CCF, tipos de documento, DANE y demás catálogos.
+
+      **Más información →**
+    </Card>
+  </CardGroup>
+</div>

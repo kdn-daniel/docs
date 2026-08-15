@@ -1,0 +1,259 @@
+---
+title: "Formularios de afiliación"
+sidebarTitle: "Formularios de afiliación"
+description: "Genera y actualiza formularios EPS y CCF por lote."
+icon: "file-pen"
+---
+
+Genera y actualiza formularios de afiliación enviando uno o varios trabajadores en una sola solicitud.
+
+El flujo es **asíncrono**: `POST` (crear o actualizar) → `IdSolicitud` → `GET` hasta que cada ítem quede en `procesado`.
+
+El tipo de formulario lo eliges con `Entidad`. Cada uno tiene su página: códigos requeridos y ejemplo.
+
+<CardGroup cols={2}>
+  <Card title="EPS" icon="heart-pulse" href="/formularios-afiliacion/eps">
+    `formularios_eps` y `CodigoEntidadEps`.
+  </Card>
+  <Card title="CCF" icon="building-2" href="/formularios-afiliacion/ccf">
+    `formularios_ccf` y `CodigoEntidadCcf`.
+  </Card>
+  <Card title="EPS y CCF" icon="layers" href="/formularios-afiliacion/eps-ccf">
+    `formularios_eps_ccf` y ambos códigos.
+  </Card>
+</CardGroup>
+
+<Info>
+  Scope: `formularios_afiliacion`. Auth en [Autenticación](/authentication).
+</Info>
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `POST` | `/v2/formularios/afiliacion` | Crea o completa un formulario |
+| `POST` | `/v2/formularios/afiliacion/actualizar` | Actualiza un formulario existente |
+| `GET` | `/v2/formularios/afiliacion/{IdSolicitud}` | Estado y PDF |
+
+```text
+https://apis.ecorpa.com/v2
+```
+
+`IdSolicitud` es un UUID. Si el path no es un UUID válido, la ruta no existe.
+
+## Conceptos
+
+| Concepto | Significado |
+| --- | --- |
+| Solicitud | Un `POST` puede devolver un `IdSolicitud` con los registros aceptados |
+| Registro | Un trabajador del lote |
+| Entidad | Tipo de formulario. Define qué códigos y PDF aplican |
+| NumeroContrato | Clave del formulario. Es único. En actualizar, ubica el registro |
+| Crédito | Cada registro **aceptado** consume 1 crédito. Los rechazados no |
+| Rechazado | No se procesa; aparece en `RegistrosRechazados` con `Motivos` |
+| Formularios | En el GET, PDF generados (`EPS` / `CCF`) con URL |
+
+## POST — Crear
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/formularios/afiliacion" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+El ejemplo completo está en la página de cada entidad.
+
+### Body (raíz)
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
+| `Entidad` | string | Sí | `formularios_eps` \| `formularios_ccf` \| `formularios_eps_ccf` |
+| `SubirADrive` | boolean o string | No | Default `false` |
+| `EnviarCorreo` | boolean o string | No | Default `false` |
+| `FirmaTrabajador` | boolean o string | No | Default `false` |
+| `FirmaCliente` | boolean o string | No | Default `false` |
+| `IncluirArl` | boolean o string | No | Default `false` |
+| `Registros` | array | Sí | Mínimo 1 trabajador |
+
+<Accordion title="Texto que respalda AceptarTerminos">
+  Al enviar `AceptarTerminos: true`, declaras:
+
+  > Dando cumplimiento al Régimen General de Hábeas Data (Ley 1581 de 2012) y en calidad de Responsable, declaro que para efectuar la siguiente consulta de información personal, cuento con el consentimiento o autorización previa, expresa e informada del titular de los datos personales que serán consultados en tiempo real a través de esta plataforma. Así mismo, declaro que la consulta efectuada corresponde a una finalidad legitima, consistente en el cumplimiento de los procesos de debida diligencia, seguridad y/o normas sobre prevención y lucha contra el lavado de activos, el terrorismo y corrupción que la organización debe cumplir por mandato legal o como buena práctica empresarial.
+</Accordion>
+
+### Cada ítem en `Registros`
+
+| Campo | Obligatorio | Notas |
+| --- | --- | --- |
+| `TipoDocumentoIdentificacion` | Sí | Código del tipo. Mayúsculas |
+| `NumeroIdentificacion` | Sí | Solo dígitos |
+| `Nombres` | Sí | Se normaliza a mayúsculas |
+| `Genero` | Sí | Catálogo (ej. `FEM`, `MAS`) |
+| `CodigoNacionalidad` | Sí | Código de país |
+| `CodigoPaisNacimiento` | Sí | Código de país |
+| `FechaNacimiento` | Sí | `dd/mm/yyyy` |
+| `CodigoDaneCiudadNacimiento` | Sí | 5 dígitos |
+| `FechaIngreso` | Sí | `dd/mm/yyyy` |
+| `Afp` | Sí | Texto |
+| `Arl` | Sí | Texto |
+| `Ibc` | Sí | Valor IBC |
+| `DireccionResidencia` | Sí | Texto |
+| `Celular` | Sí | 10 dígitos |
+| `CorreoElectronico` | Sí | Email. Se normaliza a minúsculas |
+| `CodigoDaneCiudadResidencia` | Sí | 5 dígitos |
+| `BarrioResidencia` | Sí | Texto |
+| `CodigoDaneCiudadLabor` | Sí | 5 dígitos |
+| `DireccionLabor` | Sí | Texto |
+| `BarrioLabor` | Sí | Texto |
+| `NitEmpresa` | Sí | Dígitos |
+| `Cargo` | Sí | Texto |
+| `FechaExpedicionDocumentoIdentidad` | Sí | `dd/mm/yyyy` |
+| `CodigoDaneCiudadExpedicionDocumentoIdentidad` | Sí | 5 dígitos |
+| `NumeroContrato` | Sí | Letras y números. Único |
+| `FechaRetiroUltimoContrato` | No | `dd/mm/yyyy` o `""` |
+| `CodigoEntidadEps` | Condicional | Si `Entidad` incluye EPS |
+| `CodigoEntidadCcf` | Condicional | Si `Entidad` incluye CCF |
+
+<Note>
+  Tipos de documento, género, países, DANE y códigos EPS/CCF son catálogos. El detalle está en la web de ECORPA. [Más información](https://ecorpa.com)
+</Note>
+
+### Crear vs completar vs actualizar
+
+- Contrato **nuevo** → se crea.
+- Mismo contrato y falta la otra entidad (ej. ya hay EPS y envías CCF) → se **completa** el mismo formulario.
+- Mismo contrato y quieres **cambiar** datos o un código ya lleno → usa **actualizar**.
+- `NumeroContrato` no se puede cambiar en una actualización.
+
+### Respuesta (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Entidad": "formularios_eps",
+    "Total": 1,
+    "IdSolicitud": "c565a29b-2c59-440f-9b0f-b19e2f586b92",
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidadEps": "EPS037"
+      }
+    ],
+    "RegistrosRechazados": []
+  }
+}
+```
+
+Si no hay ítems para procesar: `200` **sin** `IdSolicitud`. Revisa `RegistrosRechazados[].Motivos`.
+
+### Errores del POST
+
+| HTTP | Cuándo |
+| ---: | --- |
+| 400 | Términos, entidad o `Registros` inválidos |
+| 401 | Key inválida |
+| 403 | Sin scope o sin créditos |
+| 404 | Path incorrecto |
+| 500 | Error interno |
+
+## POST — Actualizar
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/formularios/afiliacion/actualizar" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+Mismo body que crear. Ubica el formulario por `NumeroContrato` y envía el registro **completo**.
+
+- Si hay cambios → se encola y consume 1 crédito.
+- Si no hay cambios o el contrato no existe → `RegistrosRechazados`.
+
+## GET — Consultar por IdSolicitud
+
+```bash
+curl -sS -X GET "https://apis.ecorpa.com/v2/formularios/afiliacion/{IdSolicitud}" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+### Estados
+
+| Valor | Significado |
+| --- | --- |
+| `procesando` | Aún no hay PDF; vuelve a consultar. Puede venir `Novedad` |
+| `procesado` | `Formularios[]` con las URL |
+| `error` | Falló ese registro. Revisa `Novedad` |
+
+```json
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "c565a29b-2c59-440f-9b0f-b19e2f586b92",
+    "Total": 1,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "NumeroContrato": "CTR1020304050",
+        "Estado": "procesado",
+        "Formularios": [
+          {
+            "Tipo": "EPS",
+            "Version": 1,
+            "Url": "https://…",
+            "CorreoEnviado": true,
+            "Fecha": "2026-08-04T11:45:16.055666-05:00"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+Si una URL deja de funcionar, vuelve a llamar el `GET`.
+
+### Errores del GET
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
+| 404 | `No se encontró la solicitud indicada.` | UUID inexistente |
+| 404 | `Ruta no encontrada` | Path incorrecto |
+| 500 | `Error interno del servidor` | Error interno |
+
+## Flujo
+
+<Steps>
+  <Step title="POST crear">
+    Envía `Entidad` y `Registros`. Guarda `IdSolicitud` y revisa `RegistrosRechazados`.
+  </Step>
+  <Step title="GET">
+    Mientras algún ítem esté en `procesando`, vuelve a consultar.
+  </Step>
+  <Step title="PDF">
+    Usa `Formularios[].Url`. Si hay que corregir, `POST …/actualizar` con el mismo `NumeroContrato`.
+  </Step>
+</Steps>
+
+## Checklist
+
+- API Key solo en backend
+- Scope `formularios_afiliacion`
+- `NumeroContrato` único; no se cambia en actualizar
+- Fechas en `dd/mm/yyyy`; celular 10 dígitos; DANE 5 dígitos
+- Maneja aceptados y `RegistrosRechazados` en la misma respuesta
+- Persiste `IdSolicitud` y consulta hasta `procesado`
+- Los créditos son los registros aceptados
