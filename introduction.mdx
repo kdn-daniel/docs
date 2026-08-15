@@ -1,57 +1,55 @@
 ---
-title: "EcoRPA API: Automate Workflows, Tasks, and Services"
-sidebarTitle: "Introduction"
-description: "EcoRPA is a REST API platform that lets you automate workflows, manage tasks, and connect third-party services with a single integration."
+title: "Introducción"
+sidebarTitle: "Introducción"
+description: "Qué APIs ofrece ECORPA, cuál es la URL base y cómo funciona el flujo asíncrono."
+icon: "book-open"
 ---
 
-EcoRPA is a REST API platform built for developers and teams who need to automate repetitive processes, coordinate tasks across systems, and integrate third-party services without managing complex infrastructure. Whether you're a solo developer scripting internal tooling or an engineering team embedding automation into a product, EcoRPA gives you a consistent, well-documented API that scales with your needs.
+Con las APIs de ECORPA puedes **consultar**, **generar formularios** y **radicar afiliaciones** de seguridad social en Colombia. Te autenticas con una API Key y trabajas por solicitud: envías un lote, recibes un `IdSolicitud` y luego consultas el resultado.
 
-## Key Features
+## Productos
 
-EcoRPA is designed to cover the full automation lifecycle — from defining a workflow to receiving real-time event notifications when something changes.
+| Producto | Path | Scope |
+| --- | --- | --- |
+| Consulta seguridad social | `/v2/consulta/seguridad_social` | `consultas_seguridad_social` |
+| Consulta antecedentes | `/v2/consulta/antecedentes` | `consulta_antecedentes` |
+| Formularios de afiliación | `/v2/formularios/afiliacion` | `formularios_afiliacion` |
+| Afiliaciones seguridad social | `/v2/afiliaciones/seguridad_social` | `afiliaciones_seguridad_social` |
 
-<CardGroup cols={2}>
-  <Card title="Workflow Automation" icon="bolt">
-    Build multi-step workflows that execute automatically based on triggers, schedules, or API calls. Chain actions together and handle branching logic through a single integration point.
-  </Card>
-  <Card title="Task Management" icon="list-check">
-    Create, update, assign, and monitor tasks programmatically. Keep humans and automated systems aligned with a shared task layer backed by the EcoRPA API.
-  </Card>
-  <Card title="Webhooks" icon="webhook">
-    Subscribe to real-time event notifications and have EcoRPA push updates directly to your application whenever a workflow completes, a task changes state, or an error occurs.
-  </Card>
-  <Card title="Third-Party Integrations" icon="plug">
-    Connect EcoRPA to the tools your team already uses. A unified integration layer means you authenticate once and interact with dozens of external services through a consistent API.
-  </Card>
-</CardGroup>
+Cada producto tendrá su propia guía en esta documentación.
 
-## How It Works
+## URL base
 
-The EcoRPA API follows a straightforward request-response model built on HTTPS. You authenticate with an API key, define your workflows and tasks as JSON resources, execute them via API calls, and receive results either synchronously or through webhook events.
+```text
+https://apis.ecorpa.com/v2
+```
+
+## Cómo funciona
+
+En casi todos los productos el flujo es el mismo:
 
 <Steps>
-  <Step title="Authenticate">
-    Obtain an API key from your EcoRPA dashboard and include it as a Bearer token in the `Authorization` header of every request.
+  <Step title="Autentícate">
+    Incluye tu key en el header: `Authorization: Bearer ecorpa_key_…`, con el scope del producto que vas a usar.
   </Step>
-  <Step title="Create a Workflow">
-    Send a `POST` request to `/v1/workflows` with a JSON body describing your workflow — its name, description, steps, and trigger conditions.
+  <Step title="Crea la solicitud">
+    Haz un `POST` con uno o varios registros. Si todo cuadra, te devolvemos un `IdSolicitud`.
   </Step>
-  <Step title="Execute Tasks">
-    Trigger workflow executions manually via the API or let EcoRPA run them automatically based on your configured schedule or event triggers.
-  </Step>
-  <Step title="Receive Webhook Events">
-    Configure a webhook endpoint on your server and subscribe to the events that matter to you. EcoRPA delivers real-time POST notifications whenever key state changes occur.
+  <Step title="Consulta el resultado">
+    Con un `GET` a `…/{IdSolicitud}` revisas el avance hasta que cada ítem termine (`procesado`, `error`, etc.).
   </Step>
 </Steps>
 
-## Base URL
+## Cómo respondemos
 
-All API requests are made over HTTPS to the following base URL. Append the path for the specific endpoint you want to call.
+Las respuestas van en **PascalCase** y siempre traen este sobre:
 
-```text
-https://api.ecorpa.com/v1
+```json
+{
+  "Success": true,
+  "Message": "Texto legible",
+  "Data": {}
+}
 ```
 
-<Note>
-  Ready to make your first request? Head over to the [Quickstart](/quickstart) to authenticate and call the API in under 5 minutes.
-</Note>
+Cuando quieras, sigue con [Autenticación](/authentication) para ver cómo armar el header y los scopes.

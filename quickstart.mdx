@@ -1,72 +1,37 @@
 ---
-title: "EcoRPA API Quickstart: Make Your First API Call Fast"
-sidebarTitle: "Quickstart"
-description: "Follow this step-by-step guide to authenticate, make your first API call, and create a workflow using the EcoRPA API in under 5 minutes."
+title: "Empezar"
+sidebarTitle: "Empezar"
+description: "Checklist corto para tu primera integración con las APIs ECORPA."
+icon: "rocket"
 ---
 
-This guide walks you through everything you need to go from a blank slate to a working EcoRPA workflow. By the end you'll have authenticated against the API, retrieved your existing workflows, and created a new one — all in under 5 minutes.
-
-<Note>
-  **Prerequisites:** Before you begin, make sure you have the following:
-  - An active EcoRPA account. [Sign up for free](https://app.ecorpa.com/signup) if you don't have one yet.
-  - An API key. You'll generate one in Step 1 below.
-</Note>
+Antes de pegarle a un producto, asegúrate de esto:
 
 <Steps>
-  <Step title="Get Your API Key">
-    Every request to the EcoRPA API must include a valid API key. To generate one:
-
-    1. Log in to your EcoRPA dashboard at [app.ecorpa.com](https://app.ecorpa.com).
-    2. Navigate to **Settings → API Keys**.
-    3. Click **Generate New Key**, give it a descriptive name, and select the appropriate scopes.
-    4. Copy the key immediately and store it somewhere secure — it won't be shown again.
-
-    You'll pass your API key in the `Authorization` header of every request using the Bearer token format:
-
+  <Step title="Ten tu API Key a la mano">
+    Debe empezar por `ecorpa_key_…` y traer los scopes de los productos que contrataste.
+  </Step>
+  <Step title="Arma el header">
+    En todas las llamadas: `Authorization: Bearer ecorpa_key_…`. En los `POST`, también `Content-Type: application/json`.
+  </Step>
+  <Step title="Usa la URL base">
     ```text
-    Authorization: Bearer YOUR_API_KEY
+    https://apis.ecorpa.com/v2
     ```
   </Step>
-
-  <Step title="Make Your First Request">
-    With your API key ready, make a `GET` request to the `/v1/workflows` endpoint to retrieve your list of workflows. This confirms that your credentials are valid and the API is responding correctly.
-
-    ```bash
-    curl -X GET https://api.ecorpa.com/v1/workflows \
-      -H "Authorization: Bearer YOUR_API_KEY" \
-      -H "Content-Type: application/json"
-    ```
-
-    A successful response returns a `200 OK` status and a JSON array of your workflow objects. If you see a `401 Unauthorized` error, double-check that you've copied your API key correctly.
+  <Step title="Elige el producto">
+    Cada uno tiene su path (`/consulta/seguridad_social`, `/consulta/antecedentes`, `/formularios/afiliacion`, `/afiliaciones/seguridad_social`). Las guías detalladas las vamos publicando aquí.
   </Step>
-
-  <Step title="Create a Workflow">
-    Now create your first workflow by sending a `POST` request to `/v1/workflows` with a JSON body describing it.
-
-    ```bash
-    curl -X POST https://api.ecorpa.com/v1/workflows \
-      -H "Authorization: Bearer YOUR_API_KEY" \
-      -H "Content-Type: application/json" \
-      -d '{
-        "name": "My First Workflow",
-        "description": "A test workflow",
-        "status": "active"
-      }'
-    ```
-
-    EcoRPA responds with a `201 Created` status and the full workflow object, including the unique `id` you'll use to reference this workflow in future requests.
-  </Step>
-
-  <Step title="Next Steps">
-    You've authenticated, listed your workflows, and created a new one. Here's where to go next.
-
-    <CardGroup cols={2}>
-      <Card title="Core Concepts" icon="lightbulb" href="/concepts/overview">
-        Understand the key building blocks of EcoRPA — workflows, tasks, triggers, and integrations — before diving deeper into the API.
-      </Card>
-      <Card title="Guides" icon="book-open" href="/guides/first-api-call">
-        Follow hands-on guides that walk you through real-world automation scenarios step by step.
-      </Card>
-    </CardGroup>
+  <Step title="POST y después GET">
+    Creas la solicitud, guardas `Data.IdSolicitud` y consultas el estado hasta que termine.
   </Step>
 </Steps>
+
+## Probar que la key responde
+
+```bash
+curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicitud}" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" | jq .
+```
+
+Si aún no tienes un `IdSolicitud`, empieza por [Autenticación](/authentication) y luego por la guía del producto que vayas a usar.
