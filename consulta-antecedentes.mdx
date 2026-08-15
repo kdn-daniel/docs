@@ -1,0 +1,265 @@
+---
+title: "Consulta de antecedentes"
+sidebarTitle: "Consulta de antecedentes"
+description: "Consulta de antecedentes por lote: POST, GET, fuentes e informe."
+icon: "file-search"
+---
+
+Consulta antecedentes de persona natural enviando uno o varios documentos en una sola solicitud. No eliges entidad: las fuentes se consultan juntas en esa misma solicitud.
+
+El flujo es **asíncrono**: `POST` → `IdSolicitud` → `GET` hasta que cada ítem quede en `completado`.
+
+<Info>
+  Scope: `consulta_antecedentes`. Auth en [Autenticación](/authentication).
+</Info>
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `POST` | `/v2/consulta/antecedentes` | Crea la solicitud |
+| `GET` | `/v2/consulta/antecedentes/{IdSolicitud}` | Estado, fuentes e informe |
+
+```text
+https://apis.ecorpa.com/v2
+```
+
+`IdSolicitud` es un UUID. Si el path no es un UUID válido, la ruta no existe.
+
+## Conceptos
+
+| Concepto | Significado |
+| --- | --- |
+| Solicitud | Un `POST` puede devolver un `IdSolicitud` con las consultas aceptadas |
+| Consulta | Un documento del lote: tipo + número (+ fecha de expedición, si aplica) |
+| Fuente | Cada consulta dentro del resultado (`Fuentes[]`) |
+| Crédito | Cada documento **aceptado** consume 1 crédito. Las omitidas no |
+| Omitida | No se procesa; aparece en `ConsultasOmitidas` con `Motivo` |
+| Informe | URL al PDF consolidado, cuando está listo |
+| Evidencia | URL de respaldo por fuente, cuando existe |
+
+## POST — Crear solicitud
+
+No envíes `Entidad`. Basta términos y la lista de documentos.
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "FechaExpedicionDocumentoIdentidad": "17/12/2009"
+      },
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "79856321"
+      }
+    ]
+  }'
+```
+
+### Body
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
+| `Consultas` | array | Sí | Mínimo 1, máximo **100** documentos |
+| `Consultas[].TipoDocumentoIdentificacion` | string | Sí | Código del tipo de documento |
+| `Consultas[].NumeroIdentificacion` | string | Sí | Solo dígitos `0-9` |
+| `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite |
+
+<Accordion title="Texto que respalda AceptarTerminos">
+  Al enviar `AceptarTerminos: true`, declaras:
+
+  > Dando cumplimiento al Régimen General de Hábeas Data (Ley 1581 de 2012) y en calidad de Responsable, declaro que para efectuar la siguiente consulta de información personal, cuento con el consentimiento o autorización previa, expresa e informada del titular de los datos personales que serán consultados en tiempo real a través de esta plataforma. Así mismo, declaro que la consulta efectuada corresponde a una finalidad legitima, consistente en el cumplimiento de los procesos de debida diligencia, seguridad y/o normas sobre prevención y lucha contra el lavado de activos, el terrorismo y corrupción que la organización debe cumplir por mandato legal o como buena práctica empresarial.
+</Accordion>
+
+### Tipos de documento
+
+| Código | Nombre |
+| --- | --- |
+| `CC` | Cédula de Ciudadanía |
+| `CE` | Cédula de Extranjería |
+| `TI` | Tarjeta de Identidad |
+| `RC` | Registro Civil |
+| `PA` | Pasaporte |
+| `CD` | Carné Diplomático |
+| `PEP` | Permiso Especial de Permanencia |
+| `PE` | Permiso Especial |
+| `PT` | Protección Temporal |
+| `PPT` | Permiso por Protección Temporal |
+
+### Respuesta con solicitud creada (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Total": 2,
+    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
+    "ConsultasAProcesar": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "FechaExpedicionDocumentoIdentidad": "17/12/2009"
+      }
+    ],
+    "ConsultasOmitidas": [
+      {
+        "TipoDocumentoIdentificacion": "XX",
+        "NumeroIdentificacion": "111222333",
+        "Motivo": "Tipo de identificación no válido."
+      }
+    ]
+  }
+}
+```
+
+| Campo | Descripción |
+| --- | --- |
+| `IdSolicitud` | UUID de la solicitud (solo si hubo ítems aceptados) |
+| `ConsultasAProcesar` | Encolados. Consumen crédito |
+| `ConsultasOmitidas` | No procesados, con `Motivo` |
+
+Si no hay ítems para procesar, la respuesta es `200` **sin** `IdSolicitud` y **sin** débito de créditos.
+
+### Errores del POST
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `Cuerpo de solicitud inválido` | JSON mal formado |
+| 400 | `Debe aceptar los términos (AceptarTerminos).` | Términos no aceptados |
+| 400 | `Consultas es obligatorio y debe incluir al menos un documento.` | Sin consultas |
+| 400 | `El máximo permitido es 100 documentos por solicitud…` | Más de 100 |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Sin scope |
+| 403 | `No tiene créditos disponibles para procesar esta solicitud.` | Sin cupo |
+| 404 | `Ruta no encontrada` | Path o método incorrecto |
+| 500 | `No se pudo registrar la solicitud…` / `Error interno del servidor` | Error interno |
+
+## GET — Consultar por IdSolicitud
+
+```bash
+curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/antecedentes/{IdSolicitud}" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+### Respuesta (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
+    "Total": 1,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "NombreCompleto": "Sin identificar",
+        "Estado": "completado",
+        "PorcentajeConfianza": 95,
+        "TieneHallazgos": true,
+        "EstadoInforme": "listo",
+        "InformePdf": "https://…",
+        "Fuentes": [
+          {
+            "Nombre": "…",
+            "Categoria": "Judicial",
+            "Estado": "completado",
+            "TieneNovedad": false,
+            "Nivel": "sin novedad",
+            "Mensaje": "Sin antecedentes judiciales",
+            "Evidencias": [
+              {
+                "Titulo": "Evidencia",
+                "Url": "https://…"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### Estados de la consulta
+
+| Valor | Significado |
+| --- | --- |
+| `procesando` | Aún no hay resultado final; vuelve a consultar |
+| `completado` | Resultado listo |
+| `error` | Falló el procesamiento de esa persona |
+
+Cuando está `completado` pueden venir `PorcentajeConfianza`, `TieneHallazgos`, `RequiereRevision`, `InformePdf` y `Fuentes`.
+
+`EstadoInforme`: `pendiente` \| `generando` \| `listo` \| `error`.
+
+Si `InformePdf` o una evidencia deja de funcionar, vuelve a llamar el `GET`.
+
+### Fuentes
+
+| Campo | Significado |
+| --- | --- |
+| `Nombre` | Fuente consultada |
+| `Categoria` | Clasificación de esa fuente |
+| `Estado` | `completado` \| `procesando` \| `indisponible` |
+| `TieneNovedad` | Si hubo novedad |
+| `Nivel` | Nivel del hallazgo |
+| `Mensaje` | Texto corto |
+| `Evidencias` | Lista `{ Titulo, Url }` |
+
+`PorcentajeConfianza` va de 0 a 100. Es un indicador consolidado; no reemplaza leer `Fuentes` ni el informe.
+
+<div className="result-info-cards">
+  <CardGroup cols={1}>
+    <Card title="Cómo leer el resultado" icon="book-open" href="https://ecorpa.com">
+      Qué significan confianza, hallazgos, niveles y el informe.
+
+      **Más información →**
+    </Card>
+  </CardGroup>
+</div>
+
+### Errores del GET
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
+| 404 | `No se encontró la solicitud indicada.` | UUID inexistente |
+| 404 | `Ruta no encontrada` | Path incorrecto |
+| 500 | `Error interno del servidor` | Error interno |
+
+## Flujo
+
+<Steps>
+  <Step title="POST">
+    Envía `Consultas`. Guarda `Data.IdSolicitud` y revisa `ConsultasOmitidas`.
+  </Step>
+  <Step title="GET">
+    Mientras algún ítem esté en `procesando`, vuelve a consultar.
+  </Step>
+  <Step title="Resultado">
+    Lee `PorcentajeConfianza`, `Fuentes` e `InformePdf`.
+  </Step>
+</Steps>
+
+## Checklist
+
+- API Key solo en backend
+- Scope `consulta_antecedentes`
+- Máximo 100 documentos por POST; números solo dígitos
+- Fecha de expedición opcional en `dd/mm/yyyy`
+- Maneja aceptadas y omitidas en la misma respuesta
+- Persiste `IdSolicitud` y consulta hasta `completado`
+- Distingue error HTTP de un resultado con hallazgos
+- Los créditos son los documentos aceptados, no el tamaño del array enviado

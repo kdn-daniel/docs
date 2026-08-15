@@ -39,7 +39,8 @@
         "icon": "layers",
         "pages": [
           "consultas-seguridad-social",
-          "consultas-seguridad-social/adres"
+          "consultas-seguridad-social/adres",
+          "consulta-antecedentes"
         ]
       }
     ]
