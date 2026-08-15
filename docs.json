@@ -23,9 +23,10 @@
         }
       ]
     },
-    "tabs": [
+    "groups": [
       {
-        "tab": "Guía",
+        "group": "Guía",
+        "icon": "book-open",
         "pages": [
           "index",
           "introduction",

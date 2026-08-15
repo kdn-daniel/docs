@@ -1,8 +1,65 @@
-/* Logo sizing */
-img[src*="/logo/"] {
-  height: 28px !important;
+/* —— Logo: más presente en la navbar —— */
+img.nav-logo,
+.nav-logo {
+  height: 40px !important;
+  max-height: 40px !important;
   width: auto !important;
-  max-width: 160px !important;
+  max-width: 220px !important;
+}
+
+/* —— Sidebar: más legible y con más presencia —— */
+ul.sidebar-group a {
+  font-size: 0.975rem !important;
+  font-weight: 500 !important;
+  line-height: 1.35 !important;
+  padding-top: 0.55rem !important;
+  padding-bottom: 0.55rem !important;
+  color: #0d1857 !important;
+}
+
+.dark ul.sidebar-group a {
+  color: #e8eef7 !important;
+}
+
+ul.sidebar-group a:hover {
+  color: #09aff4 !important;
+}
+
+ul.sidebar-group li[data-active="true"] a,
+ul.sidebar-group a[aria-current="page"] {
+  font-weight: 600 !important;
+  color: #09aff4 !important;
+}
+
+/* Iconos del menú un poco más grandes */
+ul.sidebar-group a svg {
+  width: 1.05rem !important;
+  height: 1.05rem !important;
+}
+
+/* Título de sección (Guía) más visible */
+.sidebar-group-header,
+[data-component-name="sidebar-group-header"],
+button[aria-expanded] .font-semibold {
+  font-size: 0.8rem !important;
+  font-weight: 700 !important;
+  letter-spacing: 0.04em !important;
+  text-transform: uppercase !important;
+  color: #0d1857 !important;
+  opacity: 0.85;
+}
+
+.dark .sidebar-group-header,
+.dark [data-component-name="sidebar-group-header"],
+.dark button[aria-expanded] .font-semibold {
+  color: #f3f6fb !important;
+}
+
+/* Anchors Sitio web / App arriba */
+nav a[href="https://ecorpa.com"],
+nav a[href="https://app.ecorpa.com"] {
+  font-weight: 560 !important;
+  font-size: 0.95rem !important;
 }
 
 /* Hide bottom floating Ask bar */
@@ -12,13 +69,11 @@ img[src*="/logo/"] {
   display: none !important;
 }
 
-/* Flat page canvas — no residual glow overlays if theme injects them */
 html,
 body {
   background-image: none !important;
 }
 
-/* Reading rhythm with brand Jost */
 #content-area {
   letter-spacing: -0.01em;
 }
