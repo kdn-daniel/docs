@@ -9,18 +9,20 @@
   },
   "favicon": "/favicon.png",
   "navigation": {
-    "anchors": [
-      {
-        "anchor": "Sitio web",
-        "icon": "globe",
-        "href": "https://ecorpa.com"
-      },
-      {
-        "anchor": "App",
-        "icon": "layout-dashboard",
-        "href": "https://app.ecorpa.com"
-      }
-    ],
+    "global": {
+      "anchors": [
+        {
+          "anchor": "Sitio web",
+          "icon": "globe",
+          "href": "https://ecorpa.com"
+        },
+        {
+          "anchor": "App",
+          "icon": "layout-dashboard",
+          "href": "https://app.ecorpa.com"
+        }
+      ]
+    },
     "tabs": [
       {
         "tab": "Guía",
