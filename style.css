@@ -37,10 +37,17 @@ ul.sidebar-group a svg {
   height: 1.05rem !important;
 }
 
-/* Título de sección (Guía) más visible */
+/* Entidades (ADRES, etc.) un nivel más adentro que el servicio */
+li[id^="/consultas-seguridad-social/"] > a {
+  margin-left: 2.15rem !important;
+  padding-left: 1rem !important;
+  width: calc(100% - 3.15rem) !important;
+  font-size: 0.92rem !important;
+}
+
+/* Título de sección (Guía / Servicios) más visible */
 .sidebar-group-header,
-[data-component-name="sidebar-group-header"],
-button[aria-expanded] .font-semibold {
+[data-component-name="sidebar-group-header"] {
   font-size: 0.8rem !important;
   font-weight: 700 !important;
   letter-spacing: 0.04em !important;
@@ -50,8 +57,7 @@ button[aria-expanded] .font-semibold {
 }
 
 .dark .sidebar-group-header,
-.dark [data-component-name="sidebar-group-header"],
-.dark button[aria-expanded] .font-semibold {
+.dark [data-component-name="sidebar-group-header"] {
   color: #f3f6fb !important;
 }
 
@@ -88,4 +94,17 @@ body {
 #content-area p,
 #content-area li {
   line-height: 1.7;
+}
+
+/* Cards de “Más información” (ADRES / entidades): más grandes y claras */
+.result-info-cards a,
+.result-info-cards [href] {
+  min-height: 11.5rem;
+  padding: 1.35rem 1.25rem !important;
+}
+
+.result-info-cards h3,
+.result-info-cards [class*="title"] {
+  font-size: 1.25rem !important;
+  font-weight: 650 !important;
 }

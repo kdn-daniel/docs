@@ -33,6 +33,14 @@
           "authentication",
           "quickstart"
         ]
+      },
+      {
+        "group": "Servicios",
+        "icon": "layers",
+        "pages": [
+          "consultas-seguridad-social",
+          "consultas-seguridad-social/adres"
+        ]
       }
     ]
   },

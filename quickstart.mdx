@@ -5,7 +5,7 @@ description: "Checklist para tu primera integración con las APIs ECORPA."
 icon: "rocket"
 ---
 
-Antes de llamar un producto, revisa esto:
+Antes de llamar un servicio, revisa esto:
 
 <Steps>
   <Step title="API Key">
@@ -19,7 +19,7 @@ Antes de llamar un producto, revisa esto:
     https://apis.ecorpa.com/v2
     ```
   </Step>
-  <Step title="Producto">
+  <Step title="Servicio">
     Path según el caso (`/consulta/seguridad_social`, `/consulta/antecedentes`, `/formularios/afiliacion`, `/afiliaciones/seguridad_social`).
   </Step>
   <Step title="POST → GET">
@@ -34,4 +34,4 @@ curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicit
   -H "Authorization: Bearer ecorpa_key_xxxxxxxx" | jq .
 ```
 
-Si aún no tienes un `IdSolicitud`, empieza por [Autenticación](/authentication) y luego la guía del producto.
+Si aún no tienes un `IdSolicitud`, empieza por [Autenticación](/authentication) y luego la guía del servicio.

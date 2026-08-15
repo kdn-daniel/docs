@@ -9,7 +9,7 @@ Documentación de las **APIs ECORPA**: autenticación, URL base y el flujo para 
 
 <CardGroup cols={2}>
   <Card title="Introducción" icon="book-open" href="/introduction">
-    Productos, URL base y flujo asíncrono.
+    Servicios, URL base y flujo asíncrono.
   </Card>
   <Card title="Autenticación" icon="key-round" href="/authentication">
     API Key, header Bearer y scopes.
@@ -17,8 +17,8 @@ Documentación de las **APIs ECORPA**: autenticación, URL base y el flujo para 
   <Card title="Empezar" icon="rocket" href="/quickstart">
     Checklist para tu primera llamada.
   </Card>
-  <Card title="Ir a la App" icon="layout-dashboard" href="https://app.ecorpa.com">
-    Genera o revisa tus API Keys.
+  <Card title="Consultas seguridad social" icon="shield-check" href="/consultas-seguridad-social">
+    POST, GET y entidades (ADRES).
   </Card>
 </CardGroup>
 
@@ -26,12 +26,12 @@ Documentación de las **APIs ECORPA**: autenticación, URL base y el flujo para 
 
 <Steps>
   <Step title="API Key">
-    En [app.ecorpa.com](https://app.ecorpa.com) → **Configuración → API Keys**, con los scopes del producto.
+    En [app.ecorpa.com](https://app.ecorpa.com) → **Configuración → API Keys**, con los scopes del servicio.
   </Step>
   <Step title="Header">
     `Authorization: Bearer ecorpa_key_…` en todas las llamadas. Detalle en [Autenticación](/authentication).
   </Step>
   <Step title="Integrar">
-    Base `https://apis.ecorpa.com/v2` + path del producto. Checklist en [Empezar](/quickstart).
+    Base `https://apis.ecorpa.com/v2` + path del servicio. Checklist en [Empezar](/quickstart).
   </Step>
 </Steps>

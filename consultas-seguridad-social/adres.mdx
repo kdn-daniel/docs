@@ -1,0 +1,87 @@
+---
+title: "ADRES"
+sidebarTitle: "ADRES"
+description: "Consulta ADRES: tipos de documento y resultados afiliado / no_afiliado."
+icon: "heart-pulse"
+---
+
+Usa `Entidad: "adres"` en el [POST del servicio](/consultas-seguridad-social). El `Resultado` de cada ítem `procesado` es específico de ADRES.
+
+<Info>
+  Flujo, créditos, omitidas y errores HTTP están en [Consultas seguridad social](/consultas-seguridad-social).
+</Info>
+
+## Request
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "adres",
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ]
+  }'
+```
+
+## Tipos de documento
+
+Envía el código en `TipoDocumentoIdentificacion`. Un tipo no válido se omite. El número debe ser solo dígitos.
+
+| Código | Nombre |
+| --- | --- |
+| `CC` | Cédula de Ciudadanía |
+| `CE` | Cédula de Extranjería |
+| `TI` | Tarjeta de Identidad |
+| `RC` | Registro Civil |
+| `PA` | Pasaporte |
+| `CD` | Carné Diplomático |
+| `NIT` | Número de Identificación Tributaria |
+| `PEP` | Permiso Especial de Permanencia |
+| `PT` | Protección Temporal |
+| `PPT` | Permiso por Protección Temporal |
+
+## Resultados
+
+`Resultado.Tipo` indica el caso. Un resultado de ADRES **no es un error HTTP**: el ítem queda `procesado`.
+
+Qué significa cada tipo, cada campo y cómo leerlo está en la web.
+
+<div className="result-info-cards">
+  <CardGroup cols={2}>
+    <Card title="Afiliado" icon="circle-check" href="https://ecorpa.com">
+      `Tipo: "afiliado"` — hay registro en ADRES.
+
+      **Más información →** significado, campos y cómo interpretarlo.
+    </Card>
+    <Card title="No afiliado" icon="circle-minus" href="https://ecorpa.com">
+      `Tipo: "no_afiliado"` — no hay registro. El ítem igual queda `procesado`.
+
+      **Más información →** por qué ocurre y qué mostrar.
+    </Card>
+  </CardGroup>
+</div>
+
+```json
+{
+  "Tipo": "afiliado",
+  "Nombres": "DANILO",
+  "Apellidos": "MEDINA MARTINEZ",
+  "EntidadEps": "…",
+  "EstadoAfiliacion": "ACTIVO",
+  "Regimen": "SUBSIDIADO"
+}
+```
+
+```json
+{
+  "Tipo": "no_afiliado",
+  "Mensaje": "El afiliado con número de documento 1020304050 no se encuentra en BDUA",
+  "Aclaracion": "…"
+}
+```

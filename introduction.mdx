@@ -1,17 +1,17 @@
 ---
 title: "Introducción"
 sidebarTitle: "Introducción"
-description: "Productos ECORPA, URL base y flujo asíncrono."
+description: "Servicios ECORPA, URL base y flujo asíncrono."
 icon: "book-open"
 ---
 
 Las APIs de ECORPA te permiten **consultar**, **generar formularios** y **radicar afiliaciones** de seguridad social en Colombia. Te autenticas con una API Key y trabajas por solicitud: envías un lote, recibes un `IdSolicitud` y consultas el resultado.
 
-## Productos
+## Servicios
 
-| Producto | Path | Scope |
+| Servicio | Path | Scope |
 | --- | --- | --- |
-| Consulta seguridad social | `/v2/consulta/seguridad_social` | `consultas_seguridad_social` |
+| [Consultas seguridad social](/consultas-seguridad-social) | `/v2/consulta/seguridad_social` | `consultas_seguridad_social` |
 | Consulta antecedentes | `/v2/consulta/antecedentes` | `consulta_antecedentes` |
 | Formularios de afiliación | `/v2/formularios/afiliacion` | `formularios_afiliacion` |
 | Afiliaciones seguridad social | `/v2/afiliaciones/seguridad_social` | `afiliaciones_seguridad_social` |
@@ -26,7 +26,7 @@ https://apis.ecorpa.com/v2
 
 <Steps>
   <Step title="Autenticar">
-    Header `Authorization: Bearer ecorpa_key_…` con el scope del producto.
+    Header `Authorization: Bearer ecorpa_key_…` con el scope del servicio.
   </Step>
   <Step title="Crear solicitud">
     `POST` con uno o varios registros. Respuesta con `IdSolicitud`.

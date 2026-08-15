@@ -1,0 +1,211 @@
+---
+title: "Consultas seguridad social"
+sidebarTitle: "Consultas seguridad social"
+description: "Consulta de seguridad social por lote: autenticación, POST, GET y cómo leer la respuesta."
+icon: "shield-check"
+---
+
+Consulta información de seguridad social enviando uno o varios documentos en una sola solicitud.
+
+El flujo es **asíncrono**: creas el lote con `POST`, guardas el `IdSolicitud` y consultas con `GET` hasta que cada ítem quede en `procesado`.
+
+La fuente la eliges con `Entidad`. Cada entidad tiene su propia página: tipos de documento y forma del `Resultado`.
+
+<CardGroup cols={2}>
+  <Card title="ADRES" icon="heart-pulse" href="/consultas-seguridad-social/adres">
+    Tipos de documento y resultados de ADRES.
+  </Card>
+</CardGroup>
+
+<Info>
+  Scope: `consultas_seguridad_social`. Auth en [Autenticación](/authentication).
+</Info>
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `POST` | `/v2/consulta/seguridad_social` | Crea la solicitud |
+| `GET` | `/v2/consulta/seguridad_social/{IdSolicitud}` | Estado y resultados |
+
+```text
+https://apis.ecorpa.com/v2
+```
+
+`IdSolicitud` es un UUID. Si el path no es un UUID válido, la ruta no existe.
+
+## Conceptos
+
+| Concepto | Significado |
+| --- | --- |
+| Solicitud | Un `POST` puede devolver un `IdSolicitud` con las consultas aceptadas |
+| Consulta | Un documento del lote: tipo + número |
+| Entidad | Fuente a consultar. Se envía en el body y define el `Resultado` |
+| Crédito | Cada documento **aceptado** consume 1 crédito. Las omitidas no |
+| Omitida | No se procesa; aparece en `ConsultasOmitidas` con `Motivo` |
+| Evidencia | URL al archivo de respaldo, cuando existe |
+
+## POST — Crear solicitud
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "adres",
+    "SubirDocumentoAPlataforma": false,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ]
+  }'
+```
+
+### Body
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
+| `Entidad` | string | Sí | Fuente a consultar. Se normaliza a minúsculas |
+| `SubirDocumentoAPlataforma` | boolean o string | No | Default `false` |
+| `Consultas` | array | Sí | Mínimo 1, máximo **100** documentos |
+| `Consultas[].TipoDocumentoIdentificacion` | string | Sí | Tipo permitido para esa entidad |
+| `Consultas[].NumeroIdentificacion` | string | Sí | Solo dígitos `0-9` |
+
+Cada entidad puede pedir campos extra en `Consultas[]`. Eso va en su página, no aquí.
+
+<Accordion title="Texto que respalda AceptarTerminos">
+  Al enviar `AceptarTerminos: true`, declaras:
+
+  > Dando cumplimiento al Régimen General de Hábeas Data (Ley 1581 de 2012) y en calidad de Responsable, declaro que para efectuar la siguiente consulta de información personal, cuento con el consentimiento o autorización previa, expresa e informada del titular de los datos personales que serán consultados en tiempo real a través de esta plataforma. Así mismo, declaro que la consulta efectuada corresponde a una finalidad legitima, consistente en el cumplimiento de los procesos de debida diligencia, seguridad y/o normas sobre prevención y lucha contra el lavado de activos, el terrorismo y corrupción que la organización debe cumplir por mandato legal o como buena práctica empresarial.
+</Accordion>
+
+Tipos de documento y campos extra: [ADRES](/consultas-seguridad-social/adres).
+
+### Respuesta con solicitud creada (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Entidad": "adres",
+    "Total": 2,
+    "IdSolicitud": "bf009ced-f1dc-42a0-b173-60f20fe02bc3",
+    "ConsultasAProcesar": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ],
+    "ConsultasOmitidas": [
+      {
+        "TipoDocumentoIdentificacion": "XX",
+        "NumeroIdentificacion": "111222333",
+        "Motivo": "Tipo de identificación no válido para esta entidad."
+      }
+    ]
+  }
+}
+```
+
+| Campo | Descripción |
+| --- | --- |
+| `IdSolicitud` | UUID de la solicitud (solo si hubo ítems aceptados) |
+| `ConsultasAProcesar` | Encolados. Consumen crédito |
+| `ConsultasOmitidas` | No procesados, con `Motivo` |
+
+Si no hay ítems para procesar, la respuesta es `200` **sin** `IdSolicitud` y **sin** débito de créditos. Revisa `ConsultasOmitidas`.
+
+### Errores del POST
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `Cuerpo de solicitud inválido` | JSON mal formado |
+| 400 | `Debe aceptar los términos (AceptarTerminos).` | Términos no aceptados |
+| 400 | `Entidad es obligatoria.` | `Entidad` vacía |
+| 400 | `Consultas es obligatorio y debe incluir al menos un documento.` | Sin consultas |
+| 400 | `El máximo permitido es 100 documentos por solicitud…` | Más de 100 |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Sin scope |
+| 403 | `No tiene créditos disponibles para procesar esta solicitud.` | Sin cupo |
+| 404 | `Ruta no encontrada` | Path o método incorrecto |
+| 500 | `No se pudo registrar la solicitud…` / `Error interno del servidor` | Error interno |
+
+## GET — Consultar por IdSolicitud
+
+```bash
+curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicitud}" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+### Respuesta (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "bf009ced-f1dc-42a0-b173-60f20fe02bc3",
+    "Entidad": "adres",
+    "Total": 1,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Estado": "procesando",
+        "FechaCreacion": "2026-08-01T12:12:28.67977+00:00"
+      }
+    ]
+  }
+}
+```
+
+### Estados
+
+| Valor | Significado |
+| --- | --- |
+| `procesando` | Aún no hay resultado final; vuelve a consultar |
+| `procesado` | Resultado listo |
+
+Cuando el ítem está `procesado` pueden venir `MensajeRespuesta`, `Resultado`, `Evidencia` y `FechaConsulta`. La forma de `Resultado` depende de la entidad.
+
+Si `Evidencia` viene y la URL deja de funcionar, vuelve a llamar el `GET` para obtener una nueva.
+
+### Errores del GET
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
+| 404 | `No se encontró la solicitud indicada.` | UUID inexistente |
+| 404 | `Ruta no encontrada` | Path incorrecto |
+| 500 | `Error interno del servidor` | Error interno |
+
+## Flujo
+
+<Steps>
+  <Step title="POST">
+    Envía `Entidad` y `Consultas`. Guarda `Data.IdSolicitud` y revisa `ConsultasOmitidas`.
+  </Step>
+  <Step title="GET">
+    Mientras algún ítem esté en `procesando`, vuelve a consultar.
+  </Step>
+  <Step title="Resultado">
+    Lee `Resultado` según la entidad. Ver [ADRES](/consultas-seguridad-social/adres).
+  </Step>
+</Steps>
+
+## Checklist
+
+- API Key solo en backend
+- Scope `consultas_seguridad_social`
+- Máximo 100 documentos por POST; números solo dígitos
+- Maneja aceptadas y omitidas en la misma respuesta
+- Persiste `IdSolicitud` y consulta hasta `procesado`
+- Distingue error HTTP de un resultado válido de la entidad
+- Los créditos son los documentos aceptados, no el tamaño del array enviado

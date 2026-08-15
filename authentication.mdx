@@ -27,11 +27,11 @@ curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicit
 
 ## Scopes
 
-Cada producto exige su permiso. Sin él, la llamada no pasa.
+Cada servicio exige su permiso. Sin él, la llamada no pasa.
 
-| Producto | Scope |
+| Servicio | Scope |
 | --- | --- |
-| Consulta seguridad social | `consultas_seguridad_social` |
+| Consultas seguridad social | `consultas_seguridad_social` |
 | Consulta antecedentes | `consulta_antecedentes` |
 | Formularios de afiliación | `formularios_afiliacion` |
 | Afiliaciones seguridad social | `afiliaciones_seguridad_social` |
@@ -41,7 +41,7 @@ Cada producto exige su permiso. Sin él, la llamada no pasa.
 | HTTP | Qué significa |
 | --- | --- |
 | `401` | Falta la key, está mal o ya no es válida |
-| `403` | La key existe, pero sin permiso para ese producto |
+| `403` | La key existe, pero sin permiso para ese servicio |
 
 ## Buenas prácticas
 
