@@ -1,72 +1,22 @@
 {
   "$schema": "https://mintlify.com/docs.json",
-  "name": "EcoRPA API",
-  "theme": "luma",
+  "name": "ECORPA",
+  "theme": "maple",
   "colors": {
-    "primary": "#ef7025",
-    "light": "#eec9bc",
-    "dark": "#4fa1ab"
+    "primary": "#09aff4",
+    "light": "#09aff4",
+    "dark": "#0d1857"
   },
   "favicon": "/favicon.svg",
   "navigation": {
     "tabs": [
       {
-        "tab": "Documentation",
-        "groups": [
-          {
-            "group": "Get Started",
-            "pages": [
-              "introduction",
-              "quickstart",
-              "authentication"
-            ]
-          },
-          {
-            "group": "Core Concepts",
-            "pages": [
-              "concepts/overview",
-              "concepts/requests",
-              "concepts/errors",
-              "concepts/pagination"
-            ]
-          },
-          {
-            "group": "Guides",
-            "pages": [
-              "guides/first-api-call",
-              "guides/webhooks",
-              "guides/rate-limits",
-              "guides/best-practices"
-            ]
-          }
-        ]
-      },
-      {
-        "tab": "API Reference",
-        "groups": [
-          {
-            "group": "Overview",
-            "pages": [
-              "api-reference/introduction",
-              "api-reference/environments"
-            ]
-          },
-          {
-            "group": "Resources",
-            "pages": [
-              "api-reference/resources/workflows",
-              "api-reference/resources/tasks",
-              "api-reference/resources/integrations",
-              "api-reference/resources/webhooks"
-            ]
-          },
-          {
-            "group": "SDKs & Tools",
-            "pages": [
-              "api-reference/sdks",
-              "api-reference/changelog"
-            ]
-          }
+        "tab": "Guía",
+        "pages": [
+          "authentication",
+          "index",
+          "introduction",
+          "quickstart"
         ]
       }
     ]
@@ -74,13 +24,41 @@
   "navbar": {
     "primary": {
       "type": "button",
-      "label": "Get API Key",
-      "href": "https://app.ecorpa.com/signup"
-    }
+      "label": "Ir a la App",
+      "href": "https://app.ecorpa.com"
+    },
+    "links": [
+      {
+        "href": "https://ecorpa.com",
+        "label": "Sitio web"
+      },
+      {
+        "href": "https://app.ecorpa.com",
+        "label": "App"
+      }
+    ]
   },
   "footer": {
     "socials": {
       "github": "https://github.com/ecorpa"
     }
+  },
+  "description": "Documentación de las APIs de ECORPA para integradores.",
+  "logo": {
+    "light": "/logo/light.svg",
+    "dark": "/logo/dark.svg",
+    "href": "https://ecorpa.com"
+  },
+  "appearance": {
+    "default": "light"
+  },
+  "background": {
+    "decoration": "gradient"
+  },
+  "fonts": {
+    "family": "Jost"
+  },
+  "icons": {
+    "library": "lucide"
   }
 }
