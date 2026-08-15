@@ -73,7 +73,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
 | `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite. Sin este dato, algunas fuentes no se consultan |
 
 <Note>
-  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero **algunas fuentes no se consultan**. Otras no la necesitan. El listado de fuentes y cuáles piden la fecha está en la web de ECORPA.
+  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero las fuentes que la requieren no se consultan.
 </Note>
 
 <Accordion title="Texto que respalda AceptarTerminos">
@@ -227,8 +227,11 @@ Si `InformePdf` o una evidencia deja de funcionar, vuelve a llamar el `GET`.
     <Card title="Cómo leer el resultado" icon="book-open">
       Qué significan confianza, hallazgos, niveles y el informe. El detalle está en la web de ECORPA.
     </Card>
-    <Card title="Fuentes y fecha de expedición" icon="calendar">
-      Sin `FechaExpedicionDocumentoIdentidad` no se consultan algunas fuentes. Cuáles la piden, cuáles no y el listado de fuentes está en la web de ECORPA.
+    <Card title="Fuentes" icon="list">
+      Qué fuentes se consultan. El listado está en la web de ECORPA.
+    </Card>
+    <Card title="Fuentes que requieren fecha de expedición" icon="calendar">
+      `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, esas fuentes no se consultan. Cuáles la piden está en la web de ECORPA.
     </Card>
   </CardGroup>
 </div>
