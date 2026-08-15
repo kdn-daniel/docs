@@ -1,0 +1,5 @@
+/* Oculta la barra flotante "Ask a question" del fondo.
+   Se mantiene el asistente desde la barra superior / search. */
+.chat-assistant-floating-input {
+  display: none !important;
+}
