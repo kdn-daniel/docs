@@ -1,0 +1,21 @@
+---
+title: "Novedades"
+sidebarTitle: "Novedades"
+description: "Cambios de las APIs ECORPA para integradores."
+icon: "megaphone"
+mode: "center"
+---
+
+Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siendo `https://apis.ecorpa.com/v2`.
+
+<Update label="Agosto 2026" description="APIs v2" tags={["Consultas", "Formularios", "Afiliaciones"]}>
+  **Consultas seguridad social** — `POST` / `GET` `/v2/consulta/seguridad_social`. Entidad: ADRES.
+
+  **Consulta de antecedentes** — `POST` / `GET` `/v2/consulta/antecedentes`. Tipo: persona natural.
+
+  **Formularios de afiliación** — crear, actualizar y GET. Entidades: EPS, CCF, EPS y CCF.
+
+  **Afiliaciones seguridad social** — radicar ante la entidad. Entidades: EPS, CCF, ARL, AFP. Canal `plataforma` o `asesor`.
+
+  Auth: API Key (`ecorpa_key_…`) y un scope por servicio.
+</Update>
