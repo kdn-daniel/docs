@@ -1,0 +1,362 @@
+---
+title: "Afiliaciones seguridad social"
+sidebarTitle: "Afiliaciones seguridad social"
+description: "Radica afiliaciones EPS, CCF, ARL o AFP por lote."
+icon: "send"
+---
+
+Radica afiliaciones directas ante EPS, Caja de Compensación, ARL o AFP enviando uno o varios trabajadores en una sola solicitud.
+
+Esto **no genera un PDF**: envía la novedad a la entidad. Para solo el formulario, usa [Formularios de afiliación](/formularios-afiliacion).
+
+El flujo es **asíncrono**: `POST` (crear o reprocesar) → `IdSolicitud` → `GET` hasta que cada ítem termine.
+
+La entidad la eliges con `Entidad`. Cada una tiene su página: código y ejemplo.
+
+<CardGroup cols={2}>
+  <Card title="EPS" icon="heart-pulse" href="/afiliaciones-seguridad-social/eps">
+    `afiliaciones_seguridad_social_eps` y `CodigoEntidad` de EPS.
+  </Card>
+  <Card title="CCF" icon="building-2" href="/afiliaciones-seguridad-social/ccf">
+    `afiliaciones_seguridad_social_ccf` y `CodigoEntidad` de CCF.
+  </Card>
+  <Card title="ARL" icon="hard-hat" href="/afiliaciones-seguridad-social/arl">
+    `afiliaciones_seguridad_social_arl` y `CodigoEntidad` de ARL.
+  </Card>
+  <Card title="AFP" icon="landmark" href="/afiliaciones-seguridad-social/afp">
+    `afiliaciones_seguridad_social_afp` y `CodigoEntidad` de AFP.
+  </Card>
+</CardGroup>
+
+<Info>
+  Scope: `afiliaciones_seguridad_social`. Auth en [Autenticación](/authentication).
+</Info>
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `POST` | `/v2/afiliaciones/seguridad_social` | Crea o reprocesa afiliaciones |
+| `GET` | `/v2/afiliaciones/seguridad_social/{IdSolicitud}` | Estado, novedades y evidencias |
+
+```text
+https://apis.ecorpa.com/v2
+```
+
+`IdSolicitud` es un UUID. Si el path no es un UUID válido, la ruta no existe.
+
+## Conceptos
+
+| Concepto | Significado |
+| --- | --- |
+| Solicitud | Un `POST` puede devolver un `IdSolicitud` con los registros aceptados |
+| Registro | Un trabajador del lote |
+| Entidad | Tipo de radicación: EPS, CCF, ARL o AFP. Define qué `CodigoEntidad` aplica |
+| CodigoEntidad | Identificador de la entidad. Va **por registro** |
+| Canal | Cómo se radica: `plataforma` o `asesor` |
+| Crédito | Cada registro **aceptado** (nuevo o reproceso) consume 1 crédito. Los rechazados no |
+| Rechazado | No se procesa; aparece en `RegistrosRechazados` con `Motivos` |
+| Reproceso | Se retoma un proceso existente; aparece en `RegistrosReproceso` |
+| Novedades | En el GET, histórico del proceso. Si hay archivo, viene `Evidencia` |
+
+## Canal
+
+| Valor | Significado |
+| --- | --- |
+| `plataforma` | Radica con las credenciales de plataforma de esa entidad |
+| `asesor` | Radica con el asesor de esa entidad |
+
+En las respuestas siempre viene `plataforma` o `asesor`.
+
+Cada entidad que envíes debe tener en ECORPA las **credenciales del canal** que vas a usar (`plataforma` o `asesor`). Esas credenciales son las que se usan para radicar.
+
+Si envías `Canal` en el registro, aplica a ese ítem. Si no, se usa el `Canal` de la raíz. Si tampoco va, se usa el que ya tengas configurado para esa entidad.
+
+Puedes mezclar canales en el mismo lote. Recibes **un** `IdSolicitud`; cada registro indica su `Canal` en el GET.
+
+```json
+{
+  "Canal": "plataforma",
+  "Registros": [
+    { "CodigoEntidad": "CCF22", "Canal": "asesor" },
+    { "CodigoEntidad": "CCF69" }
+  ]
+}
+```
+
+→ el primero va por **asesor**; el segundo, por **plataforma**.
+
+## POST — Crear o reprocesar
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/v2/afiliaciones/seguridad_social" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{ ... }'
+```
+
+El ejemplo completo está en la página de cada entidad.
+
+### Body (raíz)
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
+| `Entidad` | string | Sí | `afiliaciones_seguridad_social_eps` \| `afiliaciones_seguridad_social_ccf` \| `afiliaciones_seguridad_social_arl` \| `afiliaciones_seguridad_social_afp` |
+| `Canal` | string | No | Default del lote: `plataforma` \| `asesor` |
+| `EnviarConDocumento` | boolean o string | No | Default `false` |
+| `EnviarConFormulario` | boolean o string | No | Default `false` |
+| `FirmaTrabajador` | boolean o string | No | Default `false` |
+| `FirmaCliente` | boolean o string | No | Default `false` |
+| `RastrearCertificado` | boolean o string | No | Si `true`, el proceso puede seguir hasta certificado. Default `false` |
+| `Registros` | array | Sí | Mínimo 1 trabajador |
+
+<Accordion title="Texto que respalda AceptarTerminos">
+  Al enviar `AceptarTerminos: true`, declaras:
+
+  > Dando cumplimiento al Régimen General de Hábeas Data (Ley 1581 de 2012) y en calidad de Responsable, declaro que para efectuar la siguiente consulta de información personal, cuento con el consentimiento o autorización previa, expresa e informada del titular de los datos personales que serán consultados en tiempo real a través de esta plataforma. Así mismo, declaro que la consulta efectuada corresponde a una finalidad legitima, consistente en el cumplimiento de los procesos de debida diligencia, seguridad y/o normas sobre prevención y lucha contra el lavado de activos, el terrorismo y corrupción que la organización debe cumplir por mandato legal o como buena práctica empresarial.
+</Accordion>
+
+### Cada ítem en `Registros`
+
+| Campo | Obligatorio | Notas |
+| --- | --- | --- |
+| `TipoDocumentoIdentificacion` | Sí | Código del tipo. Mayúsculas |
+| `NumeroIdentificacion` | Sí | Solo dígitos |
+| `Nombres` | Sí | Texto |
+| `Genero` | Sí | Catálogo (ej. `FEM`, `MAS`) |
+| `CodigoNacionalidad` | Sí | Código de país |
+| `CodigoPaisNacimiento` | Sí | Código de país |
+| `FechaNacimiento` | Sí | `dd/mm/yyyy` |
+| `CodigoDaneCiudadNacimiento` | Sí | 5 dígitos |
+| `FechaIngreso` | Sí | `dd/mm/yyyy`. No puede ser futura |
+| `Afp` | Sí | Texto |
+| `Arl` | Sí | Texto |
+| `Ibc` | Sí | Valor IBC |
+| `DireccionResidencia` | Sí | Texto |
+| `Celular` | Sí | 10 dígitos |
+| `CorreoElectronico` | Sí | Email |
+| `CodigoDaneCiudadResidencia` | Sí | 5 dígitos |
+| `BarrioResidencia` | Sí | Texto |
+| `CodigoDaneCiudadLabor` | Sí | 5 dígitos |
+| `DireccionLabor` | Sí | Texto |
+| `BarrioLabor` | Sí | Texto |
+| `NitEmpresa` | Sí | Dígitos |
+| `Cargo` | Sí | Texto |
+| `FechaExpedicionDocumentoIdentidad` | Sí | `dd/mm/yyyy` |
+| `CodigoDaneCiudadExpedicionDocumentoIdentidad` | Sí | 5 dígitos |
+| `NumeroContrato` | Sí | Letras y números |
+| `FechaRetiroUltimoContrato` | No | `dd/mm/yyyy` o `""` |
+| `CodigoEntidad` | Sí | Según `Entidad` (EPS, CCF, ARL o AFP) |
+| `Canal` | No | Sobrescribe el canal de la raíz para este registro |
+
+<Note>
+  Tipos de documento, género, países, DANE y códigos de entidad son catálogos. El detalle está en la web de ECORPA. [Más información](https://ecorpa.com)
+</Note>
+
+### Nuevo, reproceso o rechazado
+
+El `POST` clasifica cada ítem en la respuesta:
+
+- `Registros` — se crea
+- `RegistrosReproceso` — se retoma; puede traer `Cambios` y estados anteriores
+- `RegistrosRechazados` — no se procesa; el motivo va en `Motivos`
+
+### Respuesta (`200`)
+
+```json
+{
+  "Success": true,
+  "Message": "Solicitud recibida: se crearon registros nuevos y se retomaron reprocesos. Todo quedó en cola.",
+  "Data": {
+    "IdSolicitud": "657175d1-80dc-4f5a-98a3-debebc49bba5",
+    "Entidad": "afiliaciones_seguridad_social_ccf",
+    "Total": 3,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "FechaIngreso": "03/08/2026",
+        "NitEmpresa": "900123456",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidad": "CCF22",
+        "Canal": "plataforma"
+      }
+    ],
+    "RegistrosReproceso": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1098765432",
+        "Nombres": "ANA GOMEZ",
+        "FechaIngreso": "01/08/2026",
+        "NitEmpresa": "900123456",
+        "NumeroContrato": "CTR1098765432",
+        "CodigoEntidad": "CCF69",
+        "Canal": "plataforma",
+        "EstadoAnterior": "procesado",
+        "EstadoEntidadAnterior": "devuelto",
+        "Cambios": [
+          {
+            "Campo": "Ibc",
+            "Anterior": "2100000",
+            "Nuevo": "2206315"
+          }
+        ]
+      }
+    ],
+    "RegistrosRechazados": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1002003000",
+        "FechaIngreso": "12/08/2026",
+        "CodigoEntidad": "CCF22",
+        "NitEmpresa": "900123456",
+        "Motivos": [
+          "Ya existe un proceso con las mismas características en estado radicado. No se puede crear otra novedad."
+        ]
+      }
+    ]
+  }
+}
+```
+
+| Campo | Descripción |
+| --- | --- |
+| `IdSolicitud` | Solo si hubo al menos un nuevo o reproceso |
+| `Total` | Nuevos + reprocesos + rechazados |
+| `Registros` | Nuevos aceptados (resumen) |
+| `RegistrosReproceso` | Reprocesos aceptados, con estados anteriores y `Cambios` |
+| `RegistrosRechazados` | No procesados, con `Motivos` |
+
+`Cambios[].Campo` usa el nombre del contrato (`Ibc`, `Celular`, `CorreoElectronico`, …).
+
+Si no hay ítems para procesar: `200` **sin** `IdSolicitud`. Revisa `RegistrosRechazados[].Motivos`.
+
+### Errores del POST
+
+| HTTP | Cuándo |
+| ---: | --- |
+| 400 | Términos, entidad, canal o `Registros` inválidos |
+| 401 | Key inválida |
+| 403 | Sin scope o sin créditos |
+| 404 | Path incorrecto |
+| 500 | Error interno |
+
+Los rechazos por ítem van en `RegistrosRechazados` con HTTP **200**.
+
+## GET — Consultar por IdSolicitud
+
+```bash
+curl -sS -X GET "https://apis.ecorpa.com/v2/afiliaciones/seguridad_social/{IdSolicitud}" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+### Estados
+
+| Campo | Valores | Qué hacer |
+| --- | --- | --- |
+| `Estado` | `procesando` \| `procesado` \| `error` | Si sigue `procesando`, vuelve a consultar |
+| `EstadoEntidad` | `radicado`, `certificado`, `devuelto`, `error`, `novedad`, `anulado`, … | Estado ante la entidad |
+
+```json
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "657175d1-80dc-4f5a-98a3-debebc49bba5",
+    "Total": 1,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidad": "CCF69",
+        "FechaIngreso": "03/08/2026",
+        "NitEmpresa": "900123456",
+        "Canal": "plataforma",
+        "Estado": "procesado",
+        "EstadoEntidad": "radicado",
+        "FechaCreacion": "2026-08-14 07:22:25",
+        "NumeroNovedad": "2026-08-15-XXXX-afi",
+        "Mensaje": "La solicitud fue creada con éxito.",
+        "Novedades": [
+          {
+            "Orden": 1,
+            "Fase": "Envío de solicitud",
+            "Mensaje": "Se recibió la solicitud de radicación.",
+            "Fecha": "2026-08-14 12:22:31"
+          },
+          {
+            "Orden": 2,
+            "Fase": "Radicado ante la CCF",
+            "Mensaje": "La solicitud fue creada con éxito.",
+            "Fecha": "2026-08-15 12:22:21",
+            "Evidencia": "https://…"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### `Novedades[]`
+
+| Campo | Descripción |
+| --- | --- |
+| `Orden` | 1 = primero |
+| `Fase` | Nombre del paso |
+| `Mensaje` | Texto del paso |
+| `Fecha` | `YYYY-MM-DD HH:MM:SS` (Colombia) |
+| `Evidencia` | Solo si ese paso tiene archivo |
+| `RespuestaEntidad` | Solo si la entidad devolvió texto extra |
+
+Si una URL deja de funcionar, vuelve a llamar el `GET`.
+
+<div className="result-info-cards">
+  <CardGroup cols={1}>
+    <Card title="Cómo leer el resultado" icon="circle-check" href="https://ecorpa.com">
+      Qué significa cada `EstadoEntidad`.
+
+      **Más información →**
+    </Card>
+  </CardGroup>
+</div>
+
+### Errores del GET
+
+| HTTP | Message | Cuándo |
+| ---: | --- | --- |
+| 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
+| 401 | `No se pudo autenticar la solicitud.` | Key inválida |
+| 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
+| 404 | `No se encontró la solicitud indicada.` | UUID inexistente |
+| 404 | `Ruta no encontrada` | Path incorrecto |
+| 500 | `Error interno del servidor` | Error interno |
+
+## Flujo
+
+<Steps>
+  <Step title="POST">
+    Envía `Entidad`, `Canal` si aplica y `Registros`. Guarda `IdSolicitud` y revisa rechazados y reprocesos.
+  </Step>
+  <Step title="GET">
+    Mientras algún ítem siga en proceso, vuelve a consultar.
+  </Step>
+  <Step title="Novedades">
+    Lee `Novedades[]` y descarga `Evidencia` si viene. Si hay que corregir, vuelve a hacer `POST`. El resultado (nuevo, reproceso o rechazo) va en esa respuesta.
+  </Step>
+</Steps>
+
+## Checklist
+
+- API Key solo en backend
+- Scope `afiliaciones_seguridad_social`
+- `Entidad` correcta (EPS, CCF, ARL o AFP) y `CodigoEntidad` + `NitEmpresa` configurados
+- Cada entidad con credenciales en ECORPA, en el canal que uses (`plataforma` o `asesor`)
+- Fechas en `dd/mm/yyyy`; `FechaIngreso` no futura; celular 10 dígitos; DANE 5 dígitos
+- Maneja nuevos, reprocesos y `RegistrosRechazados` en la misma respuesta
+- Persiste `IdSolicitud` y consulta hasta un estado terminal
+- Los créditos son los registros aceptados (nuevos + reprocesos)

@@ -45,7 +45,12 @@
           "formularios-afiliacion",
           "formularios-afiliacion/eps",
           "formularios-afiliacion/ccf",
-          "formularios-afiliacion/eps-ccf"
+          "formularios-afiliacion/eps-ccf",
+          "afiliaciones-seguridad-social",
+          "afiliaciones-seguridad-social/eps",
+          "afiliaciones-seguridad-social/ccf",
+          "afiliaciones-seguridad-social/arl",
+          "afiliaciones-seguridad-social/afp"
         ]
       }
     ]

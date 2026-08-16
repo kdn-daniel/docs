@@ -62,7 +62,8 @@ ul.sidebar-group a svg {
 /* Tipos: texto un nivel más adentro; la línea se queda en el mismo eje */
 li[id^="/consultas-seguridad-social/"] > a,
 li[id^="/consulta-antecedentes/"] > a,
-li[id^="/formularios-afiliacion/"] > a {
+li[id^="/formularios-afiliacion/"] > a,
+li[id^="/afiliaciones-seguridad-social/"] > a {
   margin-left: 16px !important;
   padding-left: 2.15rem !important;
   width: calc(100% - 16px) !important;
