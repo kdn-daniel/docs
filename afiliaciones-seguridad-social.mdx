@@ -17,12 +17,15 @@ La entidad la eliges con `Entidad`. Cada una tiene su página: código y ejemplo
   <Card title="EPS" icon="heart-pulse" href="/afiliaciones-seguridad-social/eps">
     `afiliaciones_seguridad_social_eps` y `CodigoEntidad` de EPS.
   </Card>
+
   <Card title="CCF" icon="building-2" href="/afiliaciones-seguridad-social/ccf">
     `afiliaciones_seguridad_social_ccf` y `CodigoEntidad` de CCF.
   </Card>
+
   <Card title="ARL" icon="hard-hat" href="/afiliaciones-seguridad-social/arl">
     `afiliaciones_seguridad_social_arl` y `CodigoEntidad` de ARL.
   </Card>
+
   <Card title="AFP" icon="landmark" href="/afiliaciones-seguridad-social/afp">
     `afiliaciones_seguridad_social_afp` y `CodigoEntidad` de AFP.
   </Card>
@@ -151,7 +154,7 @@ El ejemplo completo está en la página de cada entidad.
 | `Canal` | No | Sobrescribe el canal de la raíz para este registro |
 
 <Note>
-  Tipos de documento, género, países, DANE y códigos de entidad son catálogos. El detalle está en la web de ECORPA. [Más información](https://ecorpa.com)
+  Tipos de documento, género, países, DANE y códigos de entidad están en el instructivo Excel de cada módulo de afiliaciones en la [App](https://app.ecorpa.com). Se descarga ahí, con tu usuario.
 </Note>
 
 ### Nuevo, reproceso o rechazado
@@ -224,7 +227,7 @@ El `POST` clasifica cada ítem en la respuesta:
 | Campo | Descripción |
 | --- | --- |
 | `IdSolicitud` | Solo si hubo al menos un nuevo o reproceso |
-| `Total` | Nuevos + reprocesos + rechazados |
+| `Total` | Nuevos \+ reprocesos \+ rechazados |
 | `Registros` | Nuevos aceptados (resumen) |
 | `RegistrosReproceso` | Reprocesos aceptados, con estados anteriores y `Cambios` |
 | `RegistrosRechazados` | No procesados, con `Motivos` |
@@ -236,7 +239,7 @@ Si no hay ítems para procesar: `200` **sin** `IdSolicitud`. Revisa `RegistrosRe
 ### Errores del POST
 
 | HTTP | Cuándo |
-| ---: | --- |
+| --: | --- |
 | 400 | Términos, entidad, canal o `Registros` inválidos |
 | 401 | Key inválida |
 | 403 | Sin scope o sin créditos |
@@ -328,7 +331,7 @@ Si una URL deja de funcionar, vuelve a llamar el `GET`.
 ### Errores del GET
 
 | HTTP | Message | Cuándo |
-| ---: | --- | --- |
+| --: | --- | --- |
 | 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
 | 401 | `No se pudo autenticar la solicitud.` | Key inválida |
 | 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
@@ -354,9 +357,9 @@ Si una URL deja de funcionar, vuelve a llamar el `GET`.
 
 - API Key solo en backend
 - Scope `afiliaciones_seguridad_social`
-- `Entidad` correcta (EPS, CCF, ARL o AFP) y `CodigoEntidad` + `NitEmpresa` configurados
+- `Entidad` correcta (EPS, CCF, ARL o AFP) y `CodigoEntidad` \+ `NitEmpresa` configurados
 - Cada entidad con credenciales en ECORPA, en el canal que uses (`plataforma` o `asesor`)
 - Fechas en `dd/mm/yyyy`; `FechaIngreso` no futura; celular 10 dígitos; DANE 5 dígitos
 - Maneja nuevos, reprocesos y `RegistrosRechazados` en la misma respuesta
 - Persiste `IdSolicitud` y consulta hasta un estado terminal
-- Los créditos son los registros aceptados (nuevos + reprocesos)
+- Los créditos son los registros aceptados (nuevos \+ reprocesos)
