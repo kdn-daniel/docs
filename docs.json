@@ -23,35 +23,115 @@
         }
       ]
     },
-    "groups": [
+    "tabs": [
       {
-        "group": "Guía",
+        "tab": "Documentación",
         "icon": "book-open",
-        "pages": [
-          "index",
-          "introduction",
-          "authentication",
-          "quickstart",
-          "changelog"
+        "groups": [
+          {
+            "group": "Guía",
+            "icon": "book-open",
+            "pages": [
+              "index",
+              "introduction",
+              "authentication",
+              "quickstart"
+            ]
+          },
+          {
+            "group": "Servicios",
+            "icon": "layers",
+            "pages": [
+              "consultas-seguridad-social",
+              "consultas-seguridad-social/adres",
+              "consulta-antecedentes",
+              "consulta-antecedentes/persona-natural",
+              "formularios-afiliacion",
+              "formularios-afiliacion/eps",
+              "formularios-afiliacion/ccf",
+              "formularios-afiliacion/eps-ccf",
+              "afiliaciones-seguridad-social",
+              "afiliaciones-seguridad-social/eps",
+              "afiliaciones-seguridad-social/ccf",
+              "afiliaciones-seguridad-social/arl",
+              "afiliaciones-seguridad-social/afp"
+            ]
+          }
         ]
       },
       {
-        "group": "Servicios",
-        "icon": "layers",
-        "pages": [
-          "consultas-seguridad-social",
-          "consultas-seguridad-social/adres",
-          "consulta-antecedentes",
-          "consulta-antecedentes/persona-natural",
-          "formularios-afiliacion",
-          "formularios-afiliacion/eps",
-          "formularios-afiliacion/ccf",
-          "formularios-afiliacion/eps-ccf",
-          "afiliaciones-seguridad-social",
-          "afiliaciones-seguridad-social/eps",
-          "afiliaciones-seguridad-social/ccf",
-          "afiliaciones-seguridad-social/arl",
-          "afiliaciones-seguridad-social/afp"
+        "tab": "Referencia de la API",
+        "icon": "square-terminal",
+        "groups": [
+          {
+            "group": "Consultas seguridad social",
+            "icon": "shield-check",
+            "pages": [
+              "api-reference/consulta-seguridad-social/crear",
+              "api-reference/consulta-seguridad-social/consultar"
+            ]
+          },
+          {
+            "group": "Consulta de antecedentes",
+            "icon": "file-search",
+            "pages": [
+              "api-reference/consulta-antecedentes/crear",
+              "api-reference/consulta-antecedentes/consultar"
+            ]
+          },
+          {
+            "group": "Formularios de afiliación",
+            "icon": "file-pen",
+            "pages": [
+              "api-reference/formularios-afiliacion/crear",
+              "api-reference/formularios-afiliacion/actualizar",
+              "api-reference/formularios-afiliacion/consultar"
+            ]
+          },
+          {
+            "group": "Afiliaciones seguridad social",
+            "icon": "send",
+            "pages": [
+              "api-reference/afiliaciones-seguridad-social/crear",
+              "api-reference/afiliaciones-seguridad-social/consultar"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Novedades",
+        "icon": "megaphone",
+        "groups": [
+          {
+            "group": "Novedades",
+            "pages": [
+              "changelog"
+            ]
+          }
+        ]
+      },
+      {
+        "tab": "Aprender",
+        "icon": "graduation-cap",
+        "menu": [
+          {
+            "item": "Blog",
+            "icon": "newspaper",
+            "description": "Artículos en ecorpa.com",
+            "href": "https://ecorpa.com/blog.html"
+          },
+          {
+            "item": "Consulta ADRES",
+            "icon": "shield-check",
+            "description": "Cómo leer afiliado y no afiliado",
+            "href": "https://ecorpa.com/blog/resultado-consulta-adres-afiliado/"
+          },
+          {
+            "item": "Consulta de antecedentes",
+            "icon": "file-search",
+            "description": "Cómo leer el resultado y las fuentes",
+            "href": "https://ecorpa.com/blog/como-leer-resultado-consulta-antecedentes/"
+          }
         ]
       }
     ]
@@ -96,5 +176,20 @@
   "styling": {
     "eyebrows": "breadcrumbs",
     "codeblocks": "system"
+  },
+  "api": {
+    "mdx": {
+      "server": "https://apis.ecorpa.com",
+      "auth": {
+        "method": "bearer"
+      }
+    },
+    "playground": {
+      "display": "interactive"
+    },
+    "url": "full",
+    "examples": {
+      "languages": ["bash", "javascript", "python"]
+    }
   }
 }

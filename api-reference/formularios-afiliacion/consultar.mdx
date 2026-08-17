@@ -1,0 +1,60 @@
+---
+title: "Consultar solicitud"
+sidebarTitle: "Consultar solicitud"
+description: "Estado y PDF de un lote de formularios de afiliación."
+api: "GET /v2/formularios/afiliacion/{IdSolicitud}"
+---
+
+Devuelve el lote. Mientras un registro esté en `procesando`, vuelve a consultar. Cuando está `procesado`, `Formularios[]` trae las URL.
+
+Scope: `formularios_afiliacion`.
+
+<ParamField path="IdSolicitud" type="string" required>
+  UUID que devolvió el POST de [crear](/api-reference/formularios-afiliacion/crear) o [actualizar](/api-reference/formularios-afiliacion/actualizar).
+</ParamField>
+
+<ResponseField name="Data.Registros[].Estado" type="string">
+  `procesando`, `procesado` o `error`.
+</ResponseField>
+
+<ResponseField name="Data.Registros[].Formularios" type="object[]">
+  PDF generados (`EPS` / `CCF`) con `Url`. Si una URL deja de funcionar, vuelve a llamar este GET.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X GET "https://apis.ecorpa.com/v2/formularios/afiliacion/c565a29b-2c59-440f-9b0f-b19e2f586b92" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "c565a29b-2c59-440f-9b0f-b19e2f586b92",
+    "Total": 1,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "NumeroContrato": "CTR1020304050",
+        "Estado": "procesado",
+        "Formularios": [
+          {
+            "Tipo": "EPS",
+            "Version": 1,
+            "Url": "https://…",
+            "CorreoEnviado": true,
+            "Fecha": "2026-08-04T11:45:16.055666-05:00"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</ResponseExample>

@@ -1,0 +1,90 @@
+---
+title: "Crear solicitud"
+sidebarTitle: "Crear solicitud"
+description: "Crea un lote de consultas de antecedentes."
+api: "POST /v2/consulta/antecedentes"
+---
+
+Crea la solicitud y devuelve un `IdSolicitud` si hubo ítems aceptados. Qué va en cada consulta lo define el tipo: [persona natural](/consulta-antecedentes/persona-natural).
+
+Scope: `consulta_antecedentes`. Guía: [Consulta de antecedentes](/consulta-antecedentes).
+
+<Tip>
+  Probar desde aquí usa tu API Key y consume créditos por cada ítem aceptado.
+</Tip>
+
+<ParamField body="AceptarTerminos" type="boolean" required>
+  Debe ser `true`. Declara que tienes autorización del titular para consultar.
+</ParamField>
+
+<ParamField body="Consultas" type="object[]" required>
+  Ítems del lote. Mínimo 1, máximo 100. Cada uno aceptado consume 1 crédito.
+
+  <Expandable title="persona natural" defaultOpen="true">
+    <ParamField body="TipoDocumentoIdentificacion" type="string" required>
+      Código del tipo de documento (`CC`, `CE`, `PA`, `PE`, `PT`).
+    </ParamField>
+    <ParamField body="NumeroIdentificacion" type="string" required>
+      Solo dígitos `0-9`.
+    </ParamField>
+    <ParamField body="FechaExpedicionDocumentoIdentidad" type="string">
+      Formato `dd/mm/yyyy`. Si no la envías, la solicitud se crea, pero las fuentes que la requieren no se consultan.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ResponseField name="Success" type="boolean">
+  `true` si la solicitud se recibió.
+</ResponseField>
+
+<ResponseField name="Data" type="object">
+  <Expandable title="properties" defaultOpen="true">
+    <ResponseField name="IdSolicitud" type="string">
+      UUID. Solo si hubo ítems aceptados.
+    </ResponseField>
+    <ResponseField name="ConsultasAProcesar" type="object[]">
+      Encolados. Consumen crédito.
+    </ResponseField>
+    <ResponseField name="ConsultasOmitidas" type="object[]">
+      No se procesan. Traen `Motivo`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "FechaExpedicionDocumentoIdentidad": "17/12/2009"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Total": 1,
+    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
+    "ConsultasAProcesar": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ],
+    "ConsultasOmitidas": []
+  }
+}
+```
+</ResponseExample>

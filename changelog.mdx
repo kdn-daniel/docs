@@ -1,21 +1,275 @@
 ---
 title: "Novedades"
 sidebarTitle: "Novedades"
-description: "Cambios de las APIs ECORPA para integradores."
+description: "Mantente al día con lo último de ECORPA: servicios nuevos, mejoras, correcciones y cambios que te sirven al consultar, generar formularios o radicar."
 icon: "megaphone"
-mode: "center"
 ---
 
 Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siendo `https://apis.ecorpa.com/v2`.
 
-<Update label="Agosto 2026" description="APIs v2" tags={["Consultas", "Formularios", "Afiliaciones"]}>
-  **Consultas seguridad social** — `POST` / `GET` `/v2/consulta/seguridad_social`. Entidad: ADRES.
+<Update label="17 de agosto de 2026" description="Referencia de la API" tags={["Documentación"]}>
+  ## Referencia de la API
 
-  **Consulta de antecedentes** — `POST` / `GET` `/v2/consulta/antecedentes`. Tipo: persona natural.
+  Cada endpoint tiene su propia página: método, body, respuesta y un ejemplo a la derecha. Puedes probar la llamada con tu API Key.
 
-  **Formularios de afiliación** — crear, actualizar y GET. Entidades: EPS, CCF, EPS y CCF.
+  - [Crear consulta de seguridad social](/api-reference/consulta-seguridad-social/crear)
+  - [Crear consulta de antecedentes](/api-reference/consulta-antecedentes/crear)
+  - [Crear formulario](/api-reference/formularios-afiliacion/crear)
+  - [Crear o reprocesar afiliación](/api-reference/afiliaciones-seguridad-social/crear)
 
-  **Afiliaciones seguridad social** — radicar ante la entidad. Entidades: EPS, CCF, ARL, AFP. Canal `plataforma` o `asesor`.
+  La guía de cada servicio (flujo, estados, entidades) sigue en [Documentación](/).
+</Update>
 
-  Auth: API Key (`ecorpa_key_…`) y un scope por servicio.
+<Update label="11 de agosto de 2026" description="Instructivos en la App" tags={["Formularios", "Afiliaciones"]}>
+  ## Instructivos de campos y códigos
+
+  Tipos de documento, género, países, DANE y códigos de entidad **no** se publican en estas docs. Se descargan en la [App](https://app.ecorpa.com), en el módulo de formularios o de afiliaciones, con tu usuario.
+
+  Así el catálogo que usas al integrar es el mismo que ves en plataforma.
+</Update>
+
+<Update label="4 de agosto de 2026" description="docs.ecorpa.com" tags={["Documentación"]}>
+  ## Documentación pública
+
+  La documentación de integración queda en [docs.ecorpa.com](https://docs.ecorpa.com): autenticación, servicios y ejemplos.
+
+  Para interpretar resultados de ADRES y de antecedentes, los artículos están en [ecorpa.com](https://ecorpa.com/blog.html).
+</Update>
+
+<Update label="28 de julio de 2026" description="EstadoEntidad y certificado" tags={["Afiliaciones"]}>
+  ## Estado ante la entidad
+
+  En el GET de afiliaciones cada registro trae dos capas:
+
+  - `Estado` — el lote (`procesando`, `procesado`, `error`)
+  - `EstadoEntidad` — lo que ocurrió ante la entidad (`radicado`, `certificado`, `devuelto`, …)
+
+  Si envías `RastrearCertificado: true` en el POST, el proceso puede seguir hasta certificado. Detalle en [Afiliaciones seguridad social](/afiliaciones-seguridad-social).
+</Update>
+
+<Update label="21 de julio de 2026" description="Novedades y evidencias" tags={["Afiliaciones"]}>
+  ## Histórico del radicado
+
+  El GET de afiliaciones incluye `Novedades[]`: cada paso con `Orden`, `Fase`, `Mensaje` y `Fecha`. Si ese paso tiene archivo, viene `Evidencia`.
+
+  Si una URL deja de funcionar, vuelve a llamar el GET. Ver [consultar solicitud](/api-reference/afiliaciones-seguridad-social/consultar).
+</Update>
+
+<Update label="14 de julio de 2026" description="Afiliación AFP" tags={["Afiliaciones"]}>
+  ## AFP
+
+  Ya puedes radicar ante AFP con `Entidad: "afiliaciones_seguridad_social_afp"` y `CodigoEntidad` de la administradora en cada registro.
+
+  Misma ruta `POST` / `GET` `/v2/afiliaciones/seguridad_social`. Guía: [AFP](/afiliaciones-seguridad-social/afp).
+</Update>
+
+<Update label="7 de julio de 2026" description="Afiliación ARL" tags={["Afiliaciones"]}>
+  ## ARL
+
+  Radicación ante ARL con `Entidad: "afiliaciones_seguridad_social_arl"`. El `CodigoEntidad` va por registro.
+
+  Guía: [ARL](/afiliaciones-seguridad-social/arl).
+</Update>
+
+<Update label="30 de junio de 2026" description="Nuevo, reproceso y rechazo" tags={["Afiliaciones"]}>
+  ## Cómo clasifica el POST
+
+  Un mismo lote puede devolver tres listas:
+
+  - `Registros` — se crea
+  - `RegistrosReproceso` — se retoma; puede traer `Cambios` y estados anteriores
+  - `RegistrosRechazados` — no se procesa; el motivo va en `Motivos`
+
+  HTTP 200 en los tres casos. Solo los nuevos y los reprocesos aceptados consumen crédito. Si no hay nada que procesar, no viene `IdSolicitud`.
+</Update>
+
+<Update label="23 de junio de 2026" description="Canal plataforma o asesor" tags={["Afiliaciones"]}>
+  ## Canal de radicación
+
+  Cada afiliación se radica por `plataforma` o `asesor`. Puedes fijarlo en la raíz del POST o por registro.
+
+  Si un ítem trae `Canal`, ese gana. Si no, se usa el de la raíz. Cada entidad debe tener en ECORPA las credenciales del canal que vas a usar.
+
+  Detalle y ejemplo en [Canal](/afiliaciones-seguridad-social#canal).
+</Update>
+
+<Update label="16 de junio de 2026" description="Afiliación CCF" tags={["Afiliaciones"]}>
+  ## Caja de compensación
+
+  Radica ante CCF con `Entidad: "afiliaciones_seguridad_social_ccf"` y `CodigoEntidad` de la caja en cada registro.
+
+  Guía: [CCF](/afiliaciones-seguridad-social/ccf).
+</Update>
+
+<Update label="9 de junio de 2026" description="Afiliación EPS" tags={["Afiliaciones"]}>
+  ## EPS
+
+  Primera entidad de radicación directa: `Entidad: "afiliaciones_seguridad_social_eps"`. Esto **no** genera un PDF: envía la novedad a la entidad.
+
+  Para solo el formulario, sigue usando [Formularios de afiliación](/formularios-afiliacion). Guía: [EPS](/afiliaciones-seguridad-social/eps).
+</Update>
+
+<Update label="2 de junio de 2026" description="Afiliaciones seguridad social" tags={["Afiliaciones"]}>
+  ## Nuevo servicio
+
+  Ruta `POST` / `GET` `/v2/afiliaciones/seguridad_social`. Scope: `afiliaciones_seguridad_social`.
+
+  Mismo flujo asíncrono: creas el lote, guardas `IdSolicitud`, consultas hasta que cada registro termine. `CodigoEntidad` y `NitEmpresa` van por trabajador.
+
+  Referencia: [crear o reprocesar](/api-reference/afiliaciones-seguridad-social/crear).
+</Update>
+
+<Update label="26 de mayo de 2026" description="Firmas y envío de PDF" tags={["Formularios"]}>
+  ## Opciones del POST
+
+  En crear y actualizar formulario puedes enviar:
+
+  - `EnviarCorreo` — manda el PDF
+  - `FirmaTrabajador` / `FirmaCliente` — incluye firmas
+  - `IncluirArl` — agrega ARL al formulario
+  - `SubirADrive` — también deja el PDF en Drive
+
+  Todos son opcionales y por defecto `false`. Ver [crear formulario](/api-reference/formularios-afiliacion/crear).
+</Update>
+
+<Update label="19 de mayo de 2026" description="Actualizar formulario" tags={["Formularios"]}>
+  ## POST actualizar
+
+  Nueva ruta: `POST /v2/formularios/afiliacion/actualizar`.
+
+  Ubica el formulario por `NumeroContrato` y pide el registro **completo**. Ese número no se cambia.
+
+  - Si hay cambios → se encola y consume 1 crédito
+  - Si no hay cambios o el contrato no existe → `RegistrosRechazados`
+
+  Referencia: [actualizar formulario](/api-reference/formularios-afiliacion/actualizar).
+</Update>
+
+<Update label="12 de mayo de 2026" description="EPS y CCF en el mismo contrato" tags={["Formularios"]}>
+  ## Completar el formulario
+
+  Con `Entidad: "formularios_eps_ccf"` (o enviando la entidad que faltaba al mismo `NumeroContrato`) se **completa** el formulario que ya existía: no se crea otro.
+
+  Si el contrato ya tiene EPS y CCF y quieres cambiar datos, usa actualizar. Guía: [EPS y CCF](/formularios-afiliacion/eps-ccf).
+</Update>
+
+<Update label="5 de mayo de 2026" description="Formulario CCF" tags={["Formularios"]}>
+  ## Caja de compensación
+
+  Genera el PDF de CCF con `Entidad: "formularios_ccf"` y `CodigoEntidadCcf` en cada registro.
+
+  Guía: [CCF](/formularios-afiliacion/ccf).
+</Update>
+
+<Update label="28 de abril de 2026" description="NumeroContrato" tags={["Formularios"]}>
+  ## Clave del formulario
+
+  `NumeroContrato` es único. Identifica el formulario en crear, completar y actualizar.
+
+  En el GET vuelve en cada registro. No lo reutilices entre trabajadores distintos.
+</Update>
+
+<Update label="21 de abril de 2026" description="GET de formularios" tags={["Formularios"]}>
+  ## PDF en la consulta
+
+  `GET /v2/formularios/afiliacion/{IdSolicitud}` ahora trae `Formularios[]` cuando el registro está `procesado`: `Tipo` (`EPS` / `CCF`), `Version`, `Url` y si se envió correo.
+
+  Mientras esté `procesando`, vuelve a consultar. Si una URL deja de funcionar, llama otra vez el GET. Referencia: [consultar solicitud](/api-reference/formularios-afiliacion/consultar).
+</Update>
+
+<Update label="14 de abril de 2026" description="Formulario EPS" tags={["Formularios"]}>
+  ## Primera entidad de formularios
+
+  `Entidad: "formularios_eps"` y `CodigoEntidadEps` por registro. El POST crea el lote; el PDF llega en el GET.
+
+  Guía: [EPS](/formularios-afiliacion/eps).
+</Update>
+
+<Update label="7 de abril de 2026" description="Formularios de afiliación" tags={["Formularios"]}>
+  ## Nuevo servicio
+
+  Ruta `POST` `/v2/formularios/afiliacion` y `GET` `/v2/formularios/afiliacion/{IdSolicitud}`. Scope: `formularios_afiliacion`.
+
+  Envías uno o varios trabajadores. Cada registro aceptado consume 1 crédito; los rechazados van en `RegistrosRechazados` con `Motivos`.
+
+  Guía: [Formularios de afiliación](/formularios-afiliacion).
+</Update>
+
+<Update label="24 de marzo de 2026" description="Estados de antecedentes" tags={["Antecedentes"]}>
+  ## procesando, completado, error
+
+  En el GET de antecedentes cada ítem puede quedar:
+
+  - `procesando` — aún no hay resultado; vuelve a consultar
+  - `completado` — listo para leer `Fuentes` e `InformePdf`
+  - `error` — falló ese ítem
+
+  Distinto de consultas de seguridad social, donde el estado final es `procesado`.
+</Update>
+
+<Update label="17 de marzo de 2026" description="Informe y evidencias" tags={["Antecedentes"]}>
+  ## PDF consolidado
+
+  Cuando el ítem está `completado` pueden venir `InformePdf`, `PorcentajeConfianza`, `TieneHallazgos` y `Fuentes[]`. Cada fuente puede traer sus propias evidencias.
+
+  Cómo leer el resultado: [artículo en ecorpa.com](https://ecorpa.com/blog/como-leer-resultado-consulta-antecedentes/). Contrato: [persona natural](/consulta-antecedentes/persona-natural).
+</Update>
+
+<Update label="10 de marzo de 2026" description="Persona natural" tags={["Antecedentes"]}>
+  ## Tipo de consulta
+
+  El lote de antecedentes es de persona natural: tipo y número de documento. `FechaExpedicionDocumentoIdentidad` es opcional (`dd/mm/yyyy`).
+
+  Si no la envías, la solicitud se crea, pero las fuentes que la requieren no se consultan. [Más información](https://ecorpa.com/blog/fecha-expedicion-consulta-antecedentes/).
+</Update>
+
+<Update label="3 de marzo de 2026" description="Consulta de antecedentes" tags={["Antecedentes"]}>
+  ## Nuevo servicio
+
+  Ruta `POST` / `GET` `/v2/consulta/antecedentes`. Scope: `consulta_antecedentes`.
+
+  Mismo patrón: lote de hasta 100, `ConsultasAProcesar` y `ConsultasOmitidas`, `IdSolicitud` solo si hubo aceptadas. Las fuentes se consultan juntas en esa solicitud.
+
+  Guía: [Consulta de antecedentes](/consulta-antecedentes).
+</Update>
+
+<Update label="24 de febrero de 2026" description="Resultado ADRES" tags={["Consultas"]}>
+  ## Afiliado y no afiliado
+
+  Cuando el ítem está `procesado`, `Resultado.Tipo` es `afiliado` o `no_afiliado`. Eso **no** es un error HTTP: el ítem igual quedó procesado.
+
+  - [Cómo leer afiliado](https://ecorpa.com/blog/resultado-consulta-adres-afiliado/)
+  - [Cómo leer no afiliado](https://ecorpa.com/blog/consulta-adres-no-afiliado/)
+</Update>
+
+<Update label="17 de febrero de 2026" description="Entidad ADRES" tags={["Consultas"]}>
+  ## Primera fuente
+
+  `Entidad: "adres"` en el POST. El tipo de documento no válido se omite (`ConsultasOmitidas`), no tumba el lote.
+
+  Tipos y forma del `Resultado`: [ADRES](/consultas-seguridad-social/adres).
+</Update>
+
+<Update label="10 de febrero de 2026" description="Consultas seguridad social" tags={["Consultas"]}>
+  ## Nuevo servicio
+
+  Ruta `POST` / `GET` `/v2/consulta/seguridad_social`. Scope: `consultas_seguridad_social`.
+
+  Envías hasta 100 documentos. Cada aceptado consume 1 crédito. Guardas `Data.IdSolicitud` y consultas hasta `procesado`.
+
+  Guía: [Consultas seguridad social](/consultas-seguridad-social). Referencia: [crear solicitud](/api-reference/consulta-seguridad-social/crear).
+</Update>
+
+<Update label="3 de febrero de 2026" description="Autenticación y APIs v2" tags={["Auth"]}>
+  ## API Key y URL base
+
+  Las APIs de integración usan `https://apis.ecorpa.com/v2` y el header:
+
+  ```http
+  Authorization: Bearer ecorpa_key_xxxxxxxx
+  ```
+
+  Cada servicio pide su scope. Sin él, la llamada no pasa (`403`). La key se crea en [app.ecorpa.com](https://app.ecorpa.com) → Configuración → API Keys.
+
+  Guía: [Autenticación](/authentication).
 </Update>

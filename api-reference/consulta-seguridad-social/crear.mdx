@@ -1,0 +1,115 @@
+---
+title: "Crear solicitud"
+sidebarTitle: "Crear solicitud"
+description: "Crea un lote de consultas de seguridad social."
+api: "POST /v2/consulta/seguridad_social"
+---
+
+Crea la solicitud y devuelve un `IdSolicitud` si hubo documentos aceptados. El resultado no viene aquí: se consulta con el [GET](/api-reference/consulta-seguridad-social/consultar).
+
+Scope: `consultas_seguridad_social`. Guía: [Consultas seguridad social](/consultas-seguridad-social).
+
+<Tip>
+  Probar desde aquí usa tu API Key y consume créditos por cada documento aceptado.
+</Tip>
+
+<ParamField body="AceptarTerminos" type="boolean" required>
+  Debe ser `true`. Declara que tienes autorización del titular para consultar.
+</ParamField>
+
+<ParamField body="Entidad" type="string" required>
+  Fuente a consultar. Se normaliza a minúsculas. Hoy: `adres`. Detalle en [ADRES](/consultas-seguridad-social/adres).
+</ParamField>
+
+<ParamField body="SubirDocumentoAPlataforma" type="boolean" default="false">
+  Si es `true`, el archivo de respaldo también queda en la plataforma.
+</ParamField>
+
+<ParamField body="Consultas" type="object[]" required>
+  Documentos a consultar. Mínimo 1, máximo 100. Cada ítem aceptado consume 1 crédito.
+
+  <Expandable title="properties" defaultOpen="true">
+    <ParamField body="TipoDocumentoIdentificacion" type="string" required>
+      Tipo permitido para esa entidad. En ADRES, ver [tipos](/consultas-seguridad-social/adres).
+    </ParamField>
+    <ParamField body="NumeroIdentificacion" type="string" required>
+      Solo dígitos `0-9`.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ResponseField name="Success" type="boolean">
+  `true` si la solicitud se recibió.
+</ResponseField>
+
+<ResponseField name="Message" type="string">
+  Texto de la operación.
+</ResponseField>
+
+<ResponseField name="Data" type="object">
+  <Expandable title="properties" defaultOpen="true">
+    <ResponseField name="Entidad" type="string">
+      Fuente enviada.
+    </ResponseField>
+    <ResponseField name="Total" type="number">
+      Aceptadas + omitidas.
+    </ResponseField>
+    <ResponseField name="IdSolicitud" type="string">
+      UUID. Solo si hubo ítems aceptados.
+    </ResponseField>
+    <ResponseField name="ConsultasAProcesar" type="object[]">
+      Encolados. Consumen crédito.
+    </ResponseField>
+    <ResponseField name="ConsultasOmitidas" type="object[]">
+      No se procesan. Traen `Motivo`.
+    </ResponseField>
+  </Expandable>
+</ResponseField>
+
+Si no hay ítems para procesar, la respuesta es `200` **sin** `IdSolicitud` y **sin** débito. Revisa `ConsultasOmitidas`.
+
+<RequestExample>
+```bash Request
+curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "adres",
+    "SubirDocumentoAPlataforma": false,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Entidad": "adres",
+    "Total": 2,
+    "IdSolicitud": "bf009ced-f1dc-42a0-b173-60f20fe02bc3",
+    "ConsultasAProcesar": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050"
+      }
+    ],
+    "ConsultasOmitidas": [
+      {
+        "TipoDocumentoIdentificacion": "XX",
+        "NumeroIdentificacion": "111222333",
+        "Motivo": "Tipo de identificación no válido para esta entidad."
+      }
+    ]
+  }
+}
+```
+</ResponseExample>

@@ -1,0 +1,215 @@
+---
+title: "Crear formulario"
+sidebarTitle: "Crear formulario"
+description: "Crea o completa un formulario de afiliación EPS y/o CCF."
+api: "POST /v2/formularios/afiliacion"
+---
+
+Crea el formulario o **completa** el que ya existe si al mismo contrato le faltaba la otra entidad. Para cambiar datos de un formulario ya lleno usa [actualizar](/api-reference/formularios-afiliacion/actualizar).
+
+Scope: `formularios_afiliacion`. Guía: [Formularios de afiliación](/formularios-afiliacion). Códigos e instructivo: en la [App](https://app.ecorpa.com), con tu usuario.
+
+<Tip>
+  Probar desde aquí usa tu API Key y consume créditos por cada registro aceptado.
+</Tip>
+
+<ParamField body="AceptarTerminos" type="boolean" required>
+  Debe ser `true`.
+</ParamField>
+
+<ParamField body="Entidad" type="string" required>
+  `formularios_eps`, `formularios_ccf` o `formularios_eps_ccf`.
+</ParamField>
+
+<ParamField body="SubirADrive" type="boolean" default="false">
+  Si es `true`, el PDF también se sube a Drive.
+</ParamField>
+
+<ParamField body="EnviarCorreo" type="boolean" default="false">
+  Si es `true`, envía el PDF por correo.
+</ParamField>
+
+<ParamField body="FirmaTrabajador" type="boolean" default="false">
+  Incluye firma del trabajador.
+</ParamField>
+
+<ParamField body="FirmaCliente" type="boolean" default="false">
+  Incluye firma del cliente.
+</ParamField>
+
+<ParamField body="IncluirArl" type="boolean" default="false">
+  Incluye ARL en el formulario.
+</ParamField>
+
+<ParamField body="Registros" type="object[]" required>
+  Trabajadores. Mínimo 1. Cada aceptado consume 1 crédito. `NumeroContrato` es único y no se cambia después.
+
+  <Expandable title="properties">
+    <ParamField body="TipoDocumentoIdentificacion" type="string" required>
+      Código del tipo. Mayúsculas.
+    </ParamField>
+    <ParamField body="NumeroIdentificacion" type="string" required>
+      Solo dígitos.
+    </ParamField>
+    <ParamField body="Nombres" type="string" required>
+      Se normaliza a mayúsculas.
+    </ParamField>
+    <ParamField body="Genero" type="string" required>
+      Catálogo (ej. `FEM`, `MAS`).
+    </ParamField>
+    <ParamField body="CodigoNacionalidad" type="string" required>
+      Código de país.
+    </ParamField>
+    <ParamField body="CodigoPaisNacimiento" type="string" required>
+      Código de país.
+    </ParamField>
+    <ParamField body="FechaNacimiento" type="string" required>
+      `dd/mm/yyyy`.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadNacimiento" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="FechaIngreso" type="string" required>
+      `dd/mm/yyyy`.
+    </ParamField>
+    <ParamField body="Afp" type="string" required>
+      Nombre de la AFP.
+    </ParamField>
+    <ParamField body="Arl" type="string" required>
+      Nombre de la ARL.
+    </ParamField>
+    <ParamField body="Ibc" type="string" required>
+      Valor IBC.
+    </ParamField>
+    <ParamField body="DireccionResidencia" type="string" required>
+      Dirección de residencia.
+    </ParamField>
+    <ParamField body="Celular" type="string" required>
+      10 dígitos.
+    </ParamField>
+    <ParamField body="CorreoElectronico" type="string" required>
+      Se normaliza a minúsculas.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadResidencia" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="BarrioResidencia" type="string" required>
+      Barrio de residencia.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadLabor" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="DireccionLabor" type="string" required>
+      Dirección laboral.
+    </ParamField>
+    <ParamField body="BarrioLabor" type="string" required>
+      Barrio laboral.
+    </ParamField>
+    <ParamField body="NitEmpresa" type="string" required>
+      NIT de la empresa. Solo dígitos.
+    </ParamField>
+    <ParamField body="Cargo" type="string" required>
+      Cargo.
+    </ParamField>
+    <ParamField body="FechaExpedicionDocumentoIdentidad" type="string" required>
+      `dd/mm/yyyy`.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadExpedicionDocumentoIdentidad" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="NumeroContrato" type="string" required>
+      Letras y números. Único.
+    </ParamField>
+    <ParamField body="FechaRetiroUltimoContrato" type="string">
+      `dd/mm/yyyy` o `""`.
+    </ParamField>
+    <ParamField body="CodigoEntidadEps" type="string">
+      Obligatorio si `Entidad` incluye EPS.
+    </ParamField>
+    <ParamField body="CodigoEntidadCcf" type="string">
+      Obligatorio si `Entidad` incluye CCF.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ResponseField name="Data.IdSolicitud" type="string">
+  UUID. Solo si hubo registros aceptados.
+</ResponseField>
+
+<ResponseField name="Data.Registros" type="object[]">
+  Aceptados.
+</ResponseField>
+
+<ResponseField name="Data.RegistrosRechazados" type="object[]">
+  No se procesan. Traen `Motivos`.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X POST "https://apis.ecorpa.com/v2/formularios/afiliacion" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "formularios_eps",
+    "EnviarCorreo": true,
+    "FirmaTrabajador": true,
+    "FirmaCliente": true,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "Genero": "MAS",
+        "CodigoNacionalidad": "170",
+        "CodigoPaisNacimiento": "170",
+        "FechaNacimiento": "11/05/1997",
+        "CodigoDaneCiudadNacimiento": "11001",
+        "FechaIngreso": "03/08/2026",
+        "Afp": "PROTECCION S.A.",
+        "Arl": "COLPATRIA",
+        "Ibc": "1750905",
+        "DireccionResidencia": "CALLE 1 # 2-3",
+        "Celular": "3001234567",
+        "CorreoElectronico": "ejemplo@correo.com",
+        "CodigoDaneCiudadResidencia": "11001",
+        "BarrioResidencia": "CENTRO",
+        "CodigoDaneCiudadLabor": "11001",
+        "DireccionLabor": "CALLE 4 # 5-6",
+        "BarrioLabor": "CENTRO",
+        "NitEmpresa": "900123456",
+        "Cargo": "AUXILIAR",
+        "FechaExpedicionDocumentoIdentidad": "19/05/2015",
+        "CodigoDaneCiudadExpedicionDocumentoIdentidad": "11001",
+        "NumeroContrato": "CTR1020304050",
+        "FechaRetiroUltimoContrato": "",
+        "CodigoEntidadEps": "EPS037"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Su solicitud fue recibida y está en proceso.",
+  "Data": {
+    "Entidad": "formularios_eps",
+    "Total": 1,
+    "IdSolicitud": "c565a29b-2c59-440f-9b0f-b19e2f586b92",
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidadEps": "EPS037"
+      }
+    ],
+    "RegistrosRechazados": []
+  }
+}
+```
+</ResponseExample>

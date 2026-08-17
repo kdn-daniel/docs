@@ -1,0 +1,71 @@
+---
+title: "Consultar solicitud"
+sidebarTitle: "Consultar solicitud"
+description: "Estado, novedades y evidencias de una afiliación."
+api: "GET /v2/afiliaciones/seguridad_social/{IdSolicitud}"
+---
+
+Devuelve el lote. Mientras `Estado` sea `procesando`, vuelve a consultar. `EstadoEntidad` es el estado ante la entidad (`radicado`, `certificado`, `devuelto`, …).
+
+Scope: `afiliaciones_seguridad_social`. Guía: [Afiliaciones seguridad social](/afiliaciones-seguridad-social).
+
+<ParamField path="IdSolicitud" type="string" required>
+  UUID que devolvió el [POST](/api-reference/afiliaciones-seguridad-social/crear).
+</ParamField>
+
+<ResponseField name="Data.Registros[].Estado" type="string">
+  `procesando`, `procesado` o `error`.
+</ResponseField>
+
+<ResponseField name="Data.Registros[].EstadoEntidad" type="string">
+  Estado ante la entidad.
+</ResponseField>
+
+<ResponseField name="Data.Registros[].Novedades" type="object[]">
+  Histórico del proceso. `Evidencia` solo si ese paso tiene archivo. Si una URL deja de funcionar, vuelve a llamar este GET.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X GET "https://apis.ecorpa.com/v2/afiliaciones/seguridad_social/657175d1-80dc-4f5a-98a3-debebc49bba5" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "657175d1-80dc-4f5a-98a3-debebc49bba5",
+    "Total": 1,
+    "Registros": [
+      {
+        "NumeroIdentificacion": "1020304050",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidad": "EPS037",
+        "Canal": "plataforma",
+        "Estado": "procesado",
+        "EstadoEntidad": "radicado",
+        "Novedades": [
+          {
+            "Orden": 1,
+            "Fase": "Envío de solicitud",
+            "Mensaje": "Se recibió la solicitud de radicación.",
+            "Fecha": "2026-08-14 12:22:31"
+          },
+          {
+            "Orden": 2,
+            "Fase": "Radicado ante la EPS",
+            "Mensaje": "La solicitud fue creada con éxito.",
+            "Fecha": "2026-08-15 12:22:21",
+            "Evidencia": "https://…"
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+</ResponseExample>

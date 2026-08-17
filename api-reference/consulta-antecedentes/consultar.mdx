@@ -1,0 +1,53 @@
+---
+title: "Consultar solicitud"
+sidebarTitle: "Consultar solicitud"
+description: "Estado y resultado de una consulta de antecedentes."
+api: "GET /v2/consulta/antecedentes/{IdSolicitud}"
+---
+
+Devuelve el lote. Mientras un ítem esté en `procesando`, vuelve a consultar. Cómo leer `Fuentes` e `InformePdf`: [persona natural](/consulta-antecedentes/persona-natural).
+
+Scope: `consulta_antecedentes`.
+
+<ParamField path="IdSolicitud" type="string" required>
+  UUID que devolvió el [POST](/api-reference/consulta-antecedentes/crear). Si no es un UUID válido, la ruta no existe.
+</ParamField>
+
+<ResponseField name="Success" type="boolean">
+  `true` si se recuperó la solicitud.
+</ResponseField>
+
+<ResponseField name="Data.Consultas[].Estado" type="string">
+  `procesando`, `completado` o `error`.
+</ResponseField>
+
+<ResponseField name="Data.Consultas[].InformePdf" type="string">
+  URL del PDF cuando está listo. Si deja de funcionar, vuelve a llamar este GET.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/antecedentes/f76d9c31-813c-4346-b0ec-f94b9f25a01c" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
+    "Total": 1,
+    "Consultas": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Estado": "procesando"
+      }
+    ]
+  }
+}
+```
+</ResponseExample>

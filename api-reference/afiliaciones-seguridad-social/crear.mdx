@@ -1,0 +1,224 @@
+---
+title: "Crear o reprocesar"
+sidebarTitle: "Crear o reprocesar"
+description: "Radica afiliaciones EPS, CCF, ARL o AFP. Si ya existe, puede reprocesar."
+api: "POST /v2/afiliaciones/seguridad_social"
+---
+
+Clasifica cada ítem en la misma respuesta: nuevo (`Registros`), reproceso (`RegistrosReproceso`) o rechazo (`RegistrosRechazados`).
+
+Scope: `afiliaciones_seguridad_social`. Guía: [Afiliaciones seguridad social](/afiliaciones-seguridad-social). Códigos e instructivo: en la [App](https://app.ecorpa.com), con tu usuario.
+
+<Tip>
+  Probar desde aquí usa tu API Key y consume créditos por cada registro nuevo o reproceso aceptado.
+</Tip>
+
+<ParamField body="AceptarTerminos" type="boolean" required>
+  Debe ser `true`.
+</ParamField>
+
+<ParamField body="Entidad" type="string" required>
+  `afiliaciones_seguridad_social_eps`, `afiliaciones_seguridad_social_ccf`, `afiliaciones_seguridad_social_arl` o `afiliaciones_seguridad_social_afp`.
+</ParamField>
+
+<ParamField body="Canal" type="string">
+  Default del lote: `plataforma` o `asesor`. Si un registro trae `Canal`, ese gana.
+</ParamField>
+
+<ParamField body="EnviarConDocumento" type="boolean" default="false">
+  Envía con documento de identidad.
+</ParamField>
+
+<ParamField body="EnviarConFormulario" type="boolean" default="false">
+  Envía con formulario.
+</ParamField>
+
+<ParamField body="FirmaTrabajador" type="boolean" default="false">
+  Incluye firma del trabajador.
+</ParamField>
+
+<ParamField body="FirmaCliente" type="boolean" default="false">
+  Incluye firma del cliente.
+</ParamField>
+
+<ParamField body="RastrearCertificado" type="boolean" default="false">
+  Si es `true`, el proceso puede seguir hasta certificado.
+</ParamField>
+
+<ParamField body="Registros" type="object[]" required>
+  Trabajadores. Mínimo 1. Cada nuevo o reproceso aceptado consume 1 crédito.
+
+  <Expandable title="properties">
+    <ParamField body="TipoDocumentoIdentificacion" type="string" required>
+      Código del tipo. Mayúsculas.
+    </ParamField>
+    <ParamField body="NumeroIdentificacion" type="string" required>
+      Solo dígitos.
+    </ParamField>
+    <ParamField body="Nombres" type="string" required>
+      Nombre completo.
+    </ParamField>
+    <ParamField body="Genero" type="string" required>
+      Catálogo (ej. `FEM`, `MAS`).
+    </ParamField>
+    <ParamField body="CodigoNacionalidad" type="string" required>
+      Código de país.
+    </ParamField>
+    <ParamField body="CodigoPaisNacimiento" type="string" required>
+      Código de país.
+    </ParamField>
+    <ParamField body="FechaNacimiento" type="string" required>
+      `dd/mm/yyyy`.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadNacimiento" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="FechaIngreso" type="string" required>
+      `dd/mm/yyyy`. No puede ser futura.
+    </ParamField>
+    <ParamField body="Afp" type="string" required>
+      Nombre de la AFP.
+    </ParamField>
+    <ParamField body="Arl" type="string" required>
+      Nombre de la ARL.
+    </ParamField>
+    <ParamField body="Ibc" type="string" required>
+      Valor IBC.
+    </ParamField>
+    <ParamField body="DireccionResidencia" type="string" required>
+      Dirección de residencia.
+    </ParamField>
+    <ParamField body="Celular" type="string" required>
+      10 dígitos.
+    </ParamField>
+    <ParamField body="CorreoElectronico" type="string" required>
+      Email.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadResidencia" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="BarrioResidencia" type="string" required>
+      Barrio de residencia.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadLabor" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="DireccionLabor" type="string" required>
+      Dirección laboral.
+    </ParamField>
+    <ParamField body="BarrioLabor" type="string" required>
+      Barrio laboral.
+    </ParamField>
+    <ParamField body="NitEmpresa" type="string" required>
+      NIT de la empresa. Solo dígitos.
+    </ParamField>
+    <ParamField body="Cargo" type="string" required>
+      Cargo.
+    </ParamField>
+    <ParamField body="FechaExpedicionDocumentoIdentidad" type="string" required>
+      `dd/mm/yyyy`.
+    </ParamField>
+    <ParamField body="CodigoDaneCiudadExpedicionDocumentoIdentidad" type="string" required>
+      5 dígitos.
+    </ParamField>
+    <ParamField body="NumeroContrato" type="string" required>
+      Letras y números.
+    </ParamField>
+    <ParamField body="FechaRetiroUltimoContrato" type="string">
+      `dd/mm/yyyy` o `""`.
+    </ParamField>
+    <ParamField body="CodigoEntidad" type="string" required>
+      Código de la EPS, CCF, ARL o AFP, según `Entidad`.
+    </ParamField>
+    <ParamField body="Canal" type="string">
+      `plataforma` o `asesor`. Sobrescribe el canal de la raíz para este registro.
+    </ParamField>
+  </Expandable>
+</ParamField>
+
+<ResponseField name="Data.IdSolicitud" type="string">
+  UUID. Solo si hubo al menos un nuevo o reproceso.
+</ResponseField>
+
+<ResponseField name="Data.Registros" type="object[]">
+  Nuevos aceptados.
+</ResponseField>
+
+<ResponseField name="Data.RegistrosReproceso" type="object[]">
+  Reprocesos aceptados. Pueden traer `Cambios` y estados anteriores.
+</ResponseField>
+
+<ResponseField name="Data.RegistrosRechazados" type="object[]">
+  No se procesan. Traen `Motivos`. HTTP sigue siendo 200.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X POST "https://apis.ecorpa.com/v2/afiliaciones/seguridad_social" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "AceptarTerminos": true,
+    "Entidad": "afiliaciones_seguridad_social_eps",
+    "Canal": "plataforma",
+    "FirmaTrabajador": true,
+    "FirmaCliente": true,
+    "RastrearCertificado": true,
+    "Registros": [
+      {
+        "TipoDocumentoIdentificacion": "CC",
+        "NumeroIdentificacion": "1020304050",
+        "Nombres": "JUAN PEREZ",
+        "Genero": "MAS",
+        "CodigoNacionalidad": "170",
+        "CodigoPaisNacimiento": "170",
+        "FechaNacimiento": "11/05/1997",
+        "CodigoDaneCiudadNacimiento": "11001",
+        "FechaIngreso": "03/08/2026",
+        "Afp": "PROTECCION S.A.",
+        "Arl": "COLPATRIA",
+        "Ibc": "1750905",
+        "DireccionResidencia": "CALLE 1 # 2-3",
+        "Celular": "3001234567",
+        "CorreoElectronico": "ejemplo@correo.com",
+        "CodigoDaneCiudadResidencia": "11001",
+        "BarrioResidencia": "CENTRO",
+        "CodigoDaneCiudadLabor": "11001",
+        "DireccionLabor": "CALLE 4 # 5-6",
+        "BarrioLabor": "CENTRO",
+        "NitEmpresa": "900123456",
+        "Cargo": "AUXILIAR",
+        "FechaExpedicionDocumentoIdentidad": "19/05/2015",
+        "CodigoDaneCiudadExpedicionDocumentoIdentidad": "11001",
+        "NumeroContrato": "CTR1020304050",
+        "FechaRetiroUltimoContrato": "",
+        "CodigoEntidad": "EPS037"
+      }
+    ]
+  }'
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Solicitud recibida: se crearon registros nuevos y se retomaron reprocesos. Todo quedó en cola.",
+  "Data": {
+    "IdSolicitud": "657175d1-80dc-4f5a-98a3-debebc49bba5",
+    "Entidad": "afiliaciones_seguridad_social_eps",
+    "Total": 1,
+    "Registros": [
+      {
+        "NumeroIdentificacion": "1020304050",
+        "NumeroContrato": "CTR1020304050",
+        "CodigoEntidad": "EPS037",
+        "Canal": "plataforma"
+      }
+    ],
+    "RegistrosReproceso": [],
+    "RegistrosRechazados": []
+  }
+}
+```
+</ResponseExample>
