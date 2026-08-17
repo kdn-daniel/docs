@@ -38,7 +38,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
 | `Consultas[].FechaExpedicionDocumentoIdentidad` | string | No | Formato `dd/mm/yyyy`. Si viene mal, el ítem se omite |
 
 <Note>
-  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero las fuentes que la requieren no se consultan. [Más información](https://ecorpa.com)
+  `FechaExpedicionDocumentoIdentidad` es opcional. Si no la envías, la solicitud igual se crea, pero las fuentes que la requieren no se consultan. [Más información](https://ecorpa.com/blog/fecha-expedicion-consulta-antecedentes/)
 </Note>
 
 ## Tipos de documento
@@ -52,7 +52,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
 | `PT` | Protección Temporal |
 
 <Note>
-  No todas las fuentes aceptan todos los tipos. El detalle de qué documento aplica en cada fuente está en la web de ECORPA. [Más información](https://ecorpa.com)
+  No todas las fuentes aceptan todos los tipos. Lo habitual es cédula; con otros documentos el alcance puede ser menor. [Más información](https://ecorpa.com/blog/tipos-documento-consulta-antecedentes/)
 </Note>
 
 ## Resultado
@@ -88,7 +88,7 @@ Cuando el ítem está `completado` pueden venir `PorcentajeConfianza`, `TieneHal
 }
 ```
 
-`EstadoInforme`: `pendiente` \| `generando` \| `listo` \| `error`.
+`EstadoInforme`: `pendiente` | `generando` | `listo` | `error`.
 
 `PorcentajeConfianza` va de 0 a 100. Es un indicador consolidado; no reemplaza leer `Fuentes` ni el informe.
 
@@ -106,22 +106,25 @@ Cuando el ítem está `completado` pueden venir `PorcentajeConfianza`, `TieneHal
 
 <div className="result-info-cards">
   <CardGroup cols={1}>
-    <Card title="Cómo leer el resultado" icon="book-open" href="https://ecorpa.com">
+    <Card title="Cómo leer el resultado" icon="book-open" href="https://ecorpa.com/blog/como-leer-resultado-consulta-antecedentes/">
       Qué significan confianza, hallazgos, niveles y el informe.
 
       **Más información →**
     </Card>
-    <Card title="Fuentes" icon="list" href="https://ecorpa.com">
+
+    <Card title="Fuentes" icon="list" href="https://ecorpa.com/blog/fuentes-consulta-antecedentes/">
       Qué fuentes se consultan.
 
       **Más información →**
     </Card>
-    <Card title="Fuentes que requieren fecha de expedición" icon="calendar" href="https://ecorpa.com">
+
+    <Card title="Fuentes que requieren fecha de expedición" icon="calendar" href="https://ecorpa.com/blog/fecha-expedicion-consulta-antecedentes/">
       Si no envías `FechaExpedicionDocumentoIdentidad`, esas fuentes no se consultan.
 
       **Más información →**
     </Card>
-    <Card title="Tipos de documento por fuente" icon="id-card" href="https://ecorpa.com">
+
+    <Card title="Tipos de documento" icon="id-card" href="https://ecorpa.com/blog/tipos-documento-consulta-antecedentes/">
       No todas las fuentes consultan todos los tipos de documento.
 
       **Más información →**
