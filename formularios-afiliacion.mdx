@@ -15,9 +15,11 @@ El tipo de formulario lo eliges con `Entidad`. Cada uno tiene su página: códig
   <Card title="EPS" icon="heart-pulse" href="/formularios-afiliacion/eps">
     `formularios_eps` y `CodigoEntidadEps`.
   </Card>
+
   <Card title="CCF" icon="building-2" href="/formularios-afiliacion/ccf">
     `formularios_ccf` y `CodigoEntidadCcf`.
   </Card>
+
   <Card title="EPS y CCF" icon="layers" href="/formularios-afiliacion/eps-ccf">
     `formularios_eps_ccf` y ambos códigos.
   </Card>
@@ -117,7 +119,7 @@ El ejemplo completo está en la página de cada entidad.
 | `CodigoEntidadCcf` | Condicional | Si `Entidad` incluye CCF |
 
 <Note>
-  Tipos de documento, género, países, DANE y códigos EPS/CCF son catálogos. El detalle está en la web de ECORPA. [Más información](https://ecorpa.com)
+  Tipos de documento, género, países, DANE y códigos EPS/CCF están en el **instructivo Excel** de cada módulo de formularios en la App. [Descargar instructivo](https://static.ecorpa.com/Instructivo%20para%20Carga%20de%20Lotes%20Afiliaciones%20-%20Formularios%20Seguridad%20Social%20EPS%20o%20CCF.xlsx)
 </Note>
 
 ### Crear vs completar vs actualizar
@@ -156,7 +158,7 @@ Si no hay ítems para procesar: `200` **sin** `IdSolicitud`. Revisa `RegistrosRe
 ### Errores del POST
 
 | HTTP | Cuándo |
-| ---: | --- |
+| --: | --- |
 | 400 | Términos, entidad o `Registros` inválidos |
 | 401 | Key inválida |
 | 403 | Sin scope o sin créditos |
@@ -226,7 +228,7 @@ Si una URL deja de funcionar, vuelve a llamar el `GET`.
 ### Errores del GET
 
 | HTTP | Message | Cuándo |
-| ---: | --- | --- |
+| --: | --- | --- |
 | 400 | `IdSolicitud inválido.` | UUID vacío o mal formado |
 | 401 | `No se pudo autenticar la solicitud.` | Key inválida |
 | 403 | `No tiene permisos para realizar esta consulta.` | Falta scope |
