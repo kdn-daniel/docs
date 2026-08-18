@@ -45,6 +45,10 @@ Scope: `afiliaciones_seguridad_social`. Guía: [Afiliaciones seguridad social](/
   Si es `true`, el proceso puede seguir hasta certificado.
 </ParamField>
 
+<ParamField body="SubirDocumentoAPlataforma" type="boolean" default="false">
+  Si es `true`, el archivo también queda en la plataforma.
+</ParamField>
+
 <ParamField body="Registros" type="object[]" required>
   Trabajadores. Mínimo 1. Cada nuevo o reproceso aceptado consume 1 crédito.
 
@@ -164,6 +168,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/afiliaciones/seguridad_social" \
     "FirmaTrabajador": true,
     "FirmaCliente": true,
     "RastrearCertificado": true,
+    "SubirDocumentoAPlataforma": false,
     "Registros": [
       {
         "TipoDocumentoIdentificacion": "CC",

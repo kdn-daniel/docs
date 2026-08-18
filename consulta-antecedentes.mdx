@@ -48,7 +48,15 @@ https://apis.ecorpa.com/v2
 
 ## POST — Crear solicitud
 
-El body común es `AceptarTerminos` y `Consultas`. Qué va dentro de cada ítem lo define el tipo de consulta. Ver [Persona natural](/consulta-antecedentes/persona-natural).
+El body común es `AceptarTerminos`, `SubirDocumentoAPlataforma` y `Consultas`. Qué va dentro de cada ítem lo define el tipo de consulta. Ver [Persona natural](/consulta-antecedentes/persona-natural).
+
+### Body (raíz)
+
+| Campo | Tipo | Obligatorio | Descripción |
+| --- | --- | --- | --- |
+| `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
+| `SubirDocumentoAPlataforma` | boolean o string | No | Default `false` |
+| `Consultas` | array | Sí | Mínimo 1, máximo **100** |
 
 <Accordion title="Texto que respalda AceptarTerminos">
   Al enviar `AceptarTerminos: true`, declaras:

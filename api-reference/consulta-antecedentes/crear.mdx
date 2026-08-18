@@ -17,6 +17,10 @@ Scope: `consulta_antecedentes`. Guía: [Consulta de antecedentes](/consulta-ante
   Debe ser `true`. Declara que tienes autorización del titular para consultar.
 </ParamField>
 
+<ParamField body="SubirDocumentoAPlataforma" type="boolean" default="false">
+  Si es `true`, el archivo también queda en la plataforma.
+</ParamField>
+
 <ParamField body="Consultas" type="object[]" required>
   Ítems del lote. Mínimo 1, máximo 100. Cada uno aceptado consume 1 crédito.
 
@@ -58,6 +62,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/antecedentes" \
   -H "Content-Type: application/json" \
   -d '{
     "AceptarTerminos": true,
+    "SubirDocumentoAPlataforma": false,
     "Consultas": [
       {
         "TipoDocumentoIdentificacion": "CC",
