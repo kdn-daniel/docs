@@ -25,6 +25,10 @@ Scope: `consultas_seguridad_social`. Guía: [Consultas seguridad social](/consul
   Si es `true`, el archivo también queda en la plataforma.
 </ParamField>
 
+<ParamField body="ForzarReproceso" default="false" type="boolean">
+  Si es `true`, vuelve a consultar aunque ya exista un resultado reciente para ese documento. No aplica si hay una consulta en curso. Alias: `Forzar`, `Enforce`.
+</ParamField>
+
 <ParamField body="Consultas" type="object[]" required>
   Documentos a consultar. Mínimo 1, máximo 100. Cada ítem aceptado consume 1 crédito.
 
@@ -77,6 +81,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
     "AceptarTerminos": true,
     "Entidad": "adres",
     "SubirDocumentoAPlataforma": false,
+    "ForzarReproceso": false,
     "Consultas": [
       {
         "TipoDocumentoIdentificacion": "CC",

@@ -55,6 +55,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
     "AceptarTerminos": true,
     "Entidad": "adres",
     "SubirDocumentoAPlataforma": false,
+    "ForzarReproceso": false,
     "Consultas": [
       {
         "TipoDocumentoIdentificacion": "CC",
@@ -71,6 +72,7 @@ curl -sS -X POST "https://apis.ecorpa.com/v2/consulta/seguridad_social" \
 | `AceptarTerminos` | boolean o string | Sí | Debe ser `true` o `"true"` |
 | `Entidad` | string | Sí | Fuente a consultar. Se normaliza a minúsculas |
 | `SubirDocumentoAPlataforma` | boolean o string | No | Default `false` |
+| `ForzarReproceso` | boolean o string | No | Default `false`. Si `true`, consulta de nuevo aunque ya exista un resultado reciente. No aplica si hay una consulta en curso. Alias: `Forzar`, `Enforce` |
 | `Consultas` | array | Sí | Mínimo 1, máximo **100** documentos |
 | `Consultas[].TipoDocumentoIdentificacion` | string | Sí | Tipo permitido para esa entidad |
 | `Consultas[].NumeroIdentificacion` | string | Sí | Solo dígitos `0-9` |
@@ -206,6 +208,7 @@ Si `Evidencia` viene y la URL deja de funcionar, vuelve a llamar el `GET` para o
 - Scope `consultas_seguridad_social`
 - Máximo 100 documentos por POST; números solo dígitos
 - Maneja aceptadas y omitidas en la misma respuesta
+- Si necesitas repetir una consulta que ya salió, envía `ForzarReproceso: true`
 - Persiste `IdSolicitud` y consulta hasta `procesado`
 - Distingue error HTTP de un resultado válido de la entidad
 - Los créditos son los documentos aceptados, no el tamaño del array enviado

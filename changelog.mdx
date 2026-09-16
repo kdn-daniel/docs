@@ -7,6 +7,17 @@ icon: "megaphone"
 
 Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siendo `https://apis.ecorpa.com/v2`.
 
+<Update label="16 de septiembre de 2026" tags={["Consultas","Afiliaciones"]} description="ForzarReproceso">
+  ## Volver a enviar
+
+  En el POST puedes enviar `ForzarReproceso: true` (también `Forzar` o `Enforce`). Por defecto es `false`.
+
+  - [Consultas de seguridad social](/consultas-seguridad-social): consulta de nuevo aunque ya exista un resultado reciente. No aplica si hay una consulta en curso.
+  - [Afiliaciones](/afiliaciones-seguridad-social): reencola aunque el registro ya esté radicado, certificado o procesado. No aplica si hay un proceso en curso.
+
+  Referencia: [crear consulta](/api-reference/consulta-seguridad-social/crear) y [crear o reprocesar afiliación](/api-reference/afiliaciones-seguridad-social/crear).
+</Update>
+
 <Update label="17 de agosto de 2026" description="Referencia de la API" tags={["Documentación"]}>
   ## Referencia de la API
 
