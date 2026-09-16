@@ -166,6 +166,8 @@ El `POST` clasifica cada ítem en la respuesta:
 - `RegistrosReproceso` — se retoma; puede traer `Cambios` y estados anteriores
 - `RegistrosRechazados` — no se procesa; el motivo va en `Motivos`
 
+Si el registro ya está radicado o certificado, el POST lo rechaza. Con `ForzarReproceso: true` se retoma igual. El flag no aplica mientras haya un proceso en curso.
+
 ### Respuesta (`200`)
 
 ```json

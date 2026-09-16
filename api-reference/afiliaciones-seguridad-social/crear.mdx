@@ -45,6 +45,10 @@ Scope: `afiliaciones_seguridad_social`. Guía: [Afiliaciones seguridad social](/
   Si es `true`, el proceso puede seguir hasta certificado.
 </ParamField>
 
+<ParamField body="ForzarReproceso" default="false" type="boolean">
+  Si es `true`, reencola aunque el registro ya esté radicado, certificado o procesado. No aplica si hay un proceso en curso. Alias: `Forzar`, `Enforce`.
+</ParamField>
+
 <ParamField body="SubirDocumentoAPlataforma" type="boolean" default="false">
   Si es `true`, el archivo también queda en la plataforma.
 </ParamField>
