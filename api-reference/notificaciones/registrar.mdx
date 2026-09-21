@@ -1,13 +1,13 @@
 ---
 title: "Registrar URL de aviso"
 sidebarTitle: "Registrar URL"
-description: "PUT para guardar la URL a la que ECORPA envía el resultado cuando un lote termina. El secreto de firma sale una sola vez."
+description: "PUT para registrar la URL donde quieres recibir el resultado cuando un lote termina. El secreto de firma sale una sola vez."
 api: "PUT /v2/notificaciones"
 ---
 
-Guarda la URL del cliente. Vale para todos los módulos. La respuesta trae `Data.Secreto` una sola vez.
+Registra la URL donde quieres recibir el resultado. Vale para todos los módulos. La respuesta trae `Data.Secreto` una sola vez.
 
-Cualquier API Key activa. No pide un scope de un módulo.
+Usa tu API Key. No necesitas un scope de un módulo.
 
 <ParamField body="Url" type="string" required>
   HTTPS público, sin usuario ni contraseña. Se rechazan localhost, redes privadas y la metadata de la nube.

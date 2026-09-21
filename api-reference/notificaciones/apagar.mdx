@@ -1,13 +1,13 @@
 ---
 title: "Apagar URL de aviso"
 sidebarTitle: "Apagar aviso"
-description: "DELETE para apagar el aviso. El cliente vuelve a consultar el resultado con GET."
+description: "DELETE para apagar el aviso. El resultado se consulta otra vez con GET."
 api: "DELETE /v2/notificaciones"
 ---
 
-Apaga el aviso. La URL queda guardada con `Activa` en `false`. Los lotes se consultan otra vez con `GET`.
+Apaga el aviso. La URL queda guardada con `Activa` en `false`. A partir de ahí consultas el resultado con `GET`.
 
-Cualquier API Key activa.
+Usa tu API Key.
 
 <ResponseField name="Data.Url" type="string">
   URL que quedó apagada, o `null` si no había ninguna.
