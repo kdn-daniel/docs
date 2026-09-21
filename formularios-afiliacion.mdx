@@ -7,7 +7,7 @@ icon: "file-pen"
 
 Genera y actualiza formularios de afiliación enviando uno o varios trabajadores en una sola solicitud.
 
-El flujo es **asíncrono**: `POST` (crear o actualizar) → `IdSolicitud` → `GET` hasta que cada ítem quede en `procesado`.
+El flujo es **asíncrono**: `POST` (crear o actualizar) → `IdSolicitud` → aviso a tu [URL](/notificaciones) o `GET` hasta que cada ítem quede en `procesado`. Entre dos `GET` del mismo `IdSolicitud` espera al menos 10 segundos.
 
 El tipo de formulario lo eliges con `Entidad`. Cada uno tiene su página: códigos requeridos y ejemplo.
 

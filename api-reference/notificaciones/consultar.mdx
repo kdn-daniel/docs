@@ -1,0 +1,56 @@
+---
+title: "Consultar URL de aviso"
+sidebarTitle: "Consultar URL"
+description: "GET de tu URL de aviso. Indica si está activa y no devuelve el secreto."
+api: "GET /v2/notificaciones"
+---
+
+Muestra si ya registraste una URL y si el aviso está activo. No devuelve el secreto.
+
+Usa tu API Key.
+
+<ResponseField name="Data.Url" type="string">
+  URL guardada, o `null` si no hay.
+</ResponseField>
+
+<ResponseField name="Data.Activa" type="boolean">
+  `true` si ECORPA envía el aviso a esa URL.
+</ResponseField>
+
+<RequestExample>
+
+```bash Request
+curl -sS -X GET "https://apis.ecorpa.com/v2/notificaciones" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "Success": true,
+  "Message": "Configuración de notificación.",
+  "Data": {
+    "Url": "https://integrador.example/ecorpa",
+    "Activa": true
+  }
+}
+```
+
+```json 401
+{
+  "Success": false,
+  "Message": "No se pudo autenticar la solicitud."
+}
+```
+
+```json 403
+{
+  "Success": false,
+  "Message": "Este recurso solo está disponible mediante API key."
+}
+```
+
+</ResponseExample>

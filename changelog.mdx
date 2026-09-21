@@ -7,6 +7,18 @@ icon: "megaphone"
 
 Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siendo `https://apis.ecorpa.com/v2`.
 
+<Update label="21 de septiembre de 2026" tags={["Consultas","Antecedentes","Formularios","Afiliaciones"]} description="Aviso al terminar">
+  ## Aviso cuando el lote termina
+
+  Puedes registrar una URL. Cuando el lote termina, ECORPA te envía el mismo resultado del `GET`.
+
+  - Una sola URL, para los cuatro módulos: `PUT /v2/notificaciones`.
+  - El aviso llega en éxito y en error. El cuerpo trae `Modulo`, `IdSolicitud` y el mismo `Data` del `GET`.
+  - El `GET` sigue disponible. Espera al menos 10 segundos entre dos consultas del mismo `IdSolicitud`, y como máximo 30 `GET` por minuto. Si pasas el límite, la respuesta es `429`.
+
+  Guía: [Avisos](/notificaciones). Referencia: [registrar URL](/api-reference/notificaciones/registrar).
+</Update>
+
 <Update label="16 de septiembre de 2026" tags={["Consultas","Afiliaciones"]} description="ForzarReproceso">
   ## Volver a enviar
 

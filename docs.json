@@ -35,7 +35,8 @@
               "index",
               "introduction",
               "authentication",
-              "quickstart"
+              "quickstart",
+              "notificaciones"
             ]
           },
           {
@@ -94,6 +95,15 @@
             "pages": [
               "api-reference/afiliaciones-seguridad-social/crear",
               "api-reference/afiliaciones-seguridad-social/consultar"
+            ]
+          },
+          {
+            "group": "Avisos",
+            "icon": "bell",
+            "pages": [
+              "api-reference/notificaciones/registrar",
+              "api-reference/notificaciones/consultar",
+              "api-reference/notificaciones/apagar"
             ]
           }
         ]

@@ -1,0 +1,64 @@
+---
+title: "Avisos al terminar"
+sidebarTitle: "Avisos"
+description: "Registra una URL. ECORPA te envía el resultado cuando el lote termina. Reglas del aviso y del GET."
+icon: "bell"
+---
+
+Todos los módulos tienen webhook. Registras una sola URL. Cuando el lote termina, ECORPA hace `POST` a esa URL con el mismo `Data` del `GET`, más `Modulo` e `IdSolicitud`. Si no registras una URL, consultas el resultado con `GET`.
+
+## Registrar la URL
+
+`PUT https://apis.ecorpa.com/v2/notificaciones` con tu API Key.
+
+```bash
+curl -sS -X PUT "https://apis.ecorpa.com/v2/notificaciones" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"Url":"https://integrador.example/ecorpa"}'
+```
+
+La respuesta incluye `Data.Secreto` una sola vez. Guárdalo: con él verificas la firma de cada aviso.
+
+`GET /v2/notificaciones` muestra `Url` y `Activa`, sin el secreto.
+
+`DELETE /v2/notificaciones` apaga el aviso. A partir de ahí consultas el resultado con `GET`.
+
+## Reglas
+
+- Una sola URL, para todos los módulos.
+- La URL es HTTPS, sin usuario ni contraseña en la dirección, y tiene que resolver a una IP pública.
+- El aviso llega al cerrar el lote, en éxito y en error.
+- `Data` es el mismo objeto del `GET` de ese módulo.
+- Responde `2xx` para confirmar que lo recibiste.
+- Un `4xx` distinto de `408` y `429` no se reintenta.
+- Fallos de red, `408`, `429` y `5xx` se reintentan con espera creciente (5 s, 10 s, 20 s, 40 s). A la quinta vez se deja de intentar.
+- `X-Ecorpa-Delivery` se repite en los reintentos del mismo aviso. Úsalo para no procesarlo dos veces.
+- El `GET` de estado sigue disponible. Espera al menos 10 segundos entre dos consultas del mismo `IdSolicitud`. Puedes hacer como máximo 30 `GET` por minuto. Si pasas el límite, la respuesta es `429` y `Retry-After` indica los segundos de espera.
+
+`Modulo` en el aviso:
+
+| `Modulo` | Qué es |
+| --- | --- |
+| `consulta_seguridad_social` | Consulta de seguridad social |
+| `consulta_antecedentes` | Consulta de antecedentes |
+| `formularios_afiliacion` | Formularios de afiliación |
+| `afiliaciones_seguridad_social` | Afiliaciones de seguridad social |
+
+```json
+{
+  "Modulo": "formularios_afiliacion",
+  "IdSolicitud": "<uuid>",
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {}
+}
+```
+
+## Seguridad
+
+- Registrar, consultar y apagar la URL exige tu API Key (`Authorization: Bearer ecorpa_key_…`).
+- La URL no puede ser HTTP, localhost, una red privada ni la dirección de metadata de la nube. Tampoco se siguen redirecciones.
+- El secreto no vuelve a salir en el `GET`.
+- Cada `POST` trae `X-Ecorpa-Signature`: `sha256=` más el HMAC-SHA256 del cuerpo crudo, calculado con ese secreto. Firma los bytes que recibes, sin volver a serializar el JSON.
+- El aviso espera como máximo 8 segundos. Si tu servidor no responde, el lote igual termina.

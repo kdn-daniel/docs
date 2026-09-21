@@ -1,0 +1,56 @@
+---
+title: "Apagar URL de aviso"
+sidebarTitle: "Apagar aviso"
+description: "DELETE para apagar el aviso. El resultado se consulta otra vez con GET."
+api: "DELETE /v2/notificaciones"
+---
+
+Apaga el aviso. La URL queda guardada con `Activa` en `false`. A partir de ahí consultas el resultado con `GET`.
+
+Usa tu API Key.
+
+<ResponseField name="Data.Url" type="string">
+  URL que quedó apagada, o `null` si no había ninguna.
+</ResponseField>
+
+<ResponseField name="Data.Activa" type="boolean">
+  `false` después de este DELETE.
+</ResponseField>
+
+<RequestExample>
+
+```bash Request
+curl -sS -X DELETE "https://apis.ecorpa.com/v2/notificaciones" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "Success": true,
+  "Message": "La notificación quedó apagada. Las consultas siguen por GET.",
+  "Data": {
+    "Url": "https://integrador.example/ecorpa",
+    "Activa": false
+  }
+}
+```
+
+```json 401
+{
+  "Success": false,
+  "Message": "No se pudo autenticar la solicitud."
+}
+```
+
+```json 403
+{
+  "Success": false,
+  "Message": "Este recurso solo está disponible mediante API key."
+}
+```
+
+</ResponseExample>
