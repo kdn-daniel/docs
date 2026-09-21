@@ -9,7 +9,7 @@ Radica afiliaciones directas ante EPS, Caja de Compensación, ARL o AFP enviando
 
 Esto **no genera un PDF**: envía la novedad a la entidad. Para solo el formulario, usa [Formularios de afiliación](/formularios-afiliacion).
 
-El flujo es **asíncrono**: `POST` (crear o reprocesar) → `IdSolicitud` → `GET` hasta que cada ítem termine.
+El flujo es **asíncrono**: `POST` (crear o reprocesar) → `IdSolicitud` → aviso a tu [URL](/notificaciones) o `GET` hasta que cada ítem termine. Entre dos `GET` del mismo `IdSolicitud` espera al menos 10 segundos.
 
 La entidad la eliges con `Entidad`. Cada una tiene su página: código y ejemplo.
 

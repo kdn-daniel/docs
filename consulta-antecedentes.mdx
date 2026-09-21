@@ -7,7 +7,7 @@ icon: "file-search"
 
 Consulta antecedentes enviando uno o varios registros en una sola solicitud.
 
-El flujo es **asíncrono**: creas el lote con `POST`, guardas el `IdSolicitud` y consultas con `GET` hasta que cada ítem quede en `completado`.
+El flujo es **asíncrono**: creas el lote con `POST`, guardas el `IdSolicitud` y recibes el aviso en tu [URL](/notificaciones), o consultas con `GET` hasta que cada ítem quede en `completado`. Entre dos `GET` del mismo `IdSolicitud` espera al menos 10 segundos.
 
 Cada tipo de consulta pide datos distintos y devuelve un resultado distinto. Eso va en su página.
 
