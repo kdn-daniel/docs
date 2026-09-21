@@ -1,0 +1,74 @@
+---
+title: "Registrar URL de aviso"
+sidebarTitle: "Registrar URL"
+description: "PUT para guardar la URL a la que ECORPA envía el resultado cuando un lote termina. El secreto de firma sale una sola vez."
+api: "PUT /v2/notificaciones"
+---
+
+Guarda la URL del cliente. Vale para todos los módulos. La respuesta trae `Data.Secreto` una sola vez.
+
+Cualquier API Key activa. No pide un scope de un módulo.
+
+<ParamField body="Url" type="string" required>
+  HTTPS público, sin usuario ni contraseña. Se rechazan localhost, redes privadas y la metadata de la nube.
+</ParamField>
+
+<ResponseField name="Data.Url" type="string">
+  URL guardada.
+</ResponseField>
+
+<ResponseField name="Data.Activa" type="boolean">
+  `true` después de este PUT.
+</ResponseField>
+
+<ResponseField name="Data.Secreto" type="string">
+  Secreto para verificar `X-Ecorpa-Signature`. No vuelve a salir en el GET.
+</ResponseField>
+
+<RequestExample>
+
+```bash Request
+curl -sS -X PUT "https://apis.ecorpa.com/v2/notificaciones" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"Url":"https://integrador.example/ecorpa"}'
+```
+
+</RequestExample>
+
+<ResponseExample>
+
+```json 200
+{
+  "Success": true,
+  "Message": "URL de notificación guardada. Guarde el secreto; no se volverá a mostrar.",
+  "Data": {
+    "Url": "https://integrador.example/ecorpa",
+    "Activa": true,
+    "Secreto": "…"
+  }
+}
+```
+
+```json 400
+{
+  "Success": false,
+  "Message": "La URL de notificación debe usar HTTPS."
+}
+```
+
+```json 401
+{
+  "Success": false,
+  "Message": "No se pudo autenticar la solicitud."
+}
+```
+
+```json 403
+{
+  "Success": false,
+  "Message": "Este recurso solo está disponible mediante API key."
+}
+```
+
+</ResponseExample>
