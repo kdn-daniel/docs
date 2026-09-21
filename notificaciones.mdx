@@ -1,0 +1,65 @@
+---
+title: "Avisos al terminar"
+sidebarTitle: "Avisos"
+description: "Registra una URL por cliente para que ECORPA envíe el resultado cuando el lote termina, en los cuatro productos, y los límites del GET de consulta."
+icon: "bell"
+---
+
+Esto aplica a los cuatro productos: consulta de seguridad social, consulta de antecedentes, formularios de afiliación y afiliaciones de seguridad social. No es solo formularios.
+
+Hay una sola URL por cliente. Cuando el lote termina, ECORPA hace `POST` a esa URL con el mismo `Data` que devolvería el `GET`, más `Producto` e `IdSolicitud`. Si no hay URL, el integrador sigue consultando con `GET`.
+
+## Registrar la URL
+
+Autenticación igual que el resto: `Authorization: Bearer ecorpa_key_…`.
+
+```bash
+curl -sS -X PUT "https://apis.ecorpa.com/v2/notificaciones" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{"Url":"https://integrador.example/ecorpa"}'
+```
+
+La URL tiene que ser **HTTPS** y pública. La respuesta incluye `Data.Secreto` **una sola vez**. Guárdalo: firma cada aviso y no se vuelve a mostrar.
+
+`GET /v2/notificaciones` muestra `Url` y `Activa`, sin el secreto.
+
+`DELETE /v2/notificaciones` apaga el aviso. A partir de ahí ese cliente vuelve a consultar con `GET`.
+
+## Qué llega en el POST
+
+`Producto` identifica el servicio:
+
+| `Producto` | Servicio |
+| --- | --- |
+| `consulta_seguridad_social` | Consulta de seguridad social |
+| `consulta_antecedentes` | Consulta de antecedentes |
+| `formularios_afiliacion` | Formularios de afiliación |
+| `afiliaciones_seguridad_social` | Afiliaciones de seguridad social |
+
+```json
+{
+  "Producto": "formularios_afiliacion",
+  "IdSolicitud": "<uuid>",
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {}
+}
+```
+
+`Data` es el mismo objeto del `GET` de ese producto.
+
+Cabeceras:
+
+- `X-Ecorpa-Signature`: `sha256=` más el HMAC-SHA256 del **cuerpo crudo**, calculado con el secreto.
+- `X-Ecorpa-Delivery`: identificador del envío. Se repite si ECORPA reintenta el mismo aviso.
+
+Responde `2xx` para confirmar. Un `4xx` distinto de `408` y `429` no se reintenta. Los fallos de red y los `5xx` sí, con espera creciente.
+
+## Si sigues consultando con GET
+
+El `GET` de estado sigue disponible en los cuatro productos.
+
+- Mínimo **10 segundos** entre dos consultas del mismo `IdSolicitud`.
+- Máximo **30 GET por minuto** por cliente, sumando los cuatro productos.
+- Si se pasa el tope, la respuesta es `429` y la cabecera `Retry-After` dice cuántos segundos esperar.
