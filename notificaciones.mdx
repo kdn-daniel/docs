@@ -30,6 +30,7 @@ La respuesta incluye `Data.Secreto` una sola vez. Guárdalo: con él verificas l
 - La URL es HTTPS, sin usuario ni contraseña en la dirección, y tiene que resolver a una IP pública.
 - El aviso llega al cerrar el lote, en éxito y en error.
 - `Data` es el mismo objeto del `GET` de ese módulo.
+- En afiliaciones, cuando una consulta de certificados cambia el estado de alguien, llega otro aviso del mismo `IdSolicitud`. `Data.Registros` trae solo esas personas, con `JobId` y el `EstadoEntidad` nuevo. Quien sigue en `radicado` no va. El mensaje es `Actualización de certificados.`
 - Responde `2xx` para confirmar que lo recibiste.
 - Un `4xx` distinto de `408` y `429` no se reintenta.
 - Fallos de red, `408`, `429` y `5xx` se reintentan con espera creciente (5 s, 10 s, 20 s, 40 s). A la quinta vez se deja de intentar.
