@@ -5,7 +5,7 @@ description: "Autenticación de las APIs ECORPA: API Key, header Authorization B
 icon: "key-round"
 ---
 
-Para las APIs de integración basta tu **API Key**.
+Para las APIs de integración basta tu **API Key**. Hay dos: producción y prueba. La URL es la misma.
 
 ## Header
 
@@ -14,15 +14,30 @@ Authorization: Bearer ecorpa_key_xxxxxxxx
 Content-Type: application/json
 ```
 
-- Empieza por `ecorpa_key_…`
-- Se entrega al activar la integración
+- Producción empieza por `ecorpa_key_…`. Gasta créditos y ejecuta el proceso real.
+- Prueba empieza por `ecorpa_test_…`. No gasta créditos, no guarda datos y no envía el aviso. El `POST` y el `GET` del id fijo de cada módulo devuelven el caso de éxito ya procesado.
+- Se entrega al activar la integración, o la creas en la app
 - Solo en backend o gestor de secretos — nunca en front ni en repos públicos
+
+## Ids de prueba
+
+Con una key `ecorpa_test_…`, el `GET` de otro id responde que no encontró la solicitud. Estos id sí devuelven el ejemplo:
+
+| Módulo | IdSolicitud |
+| --- | --- |
+| Consultas seguridad social | `11111111-1111-4111-8111-111111111111` |
+| Consulta de antecedentes | `22222222-2222-4222-8222-222222222222` |
+| Formularios de afiliación | `33333333-3333-4333-8333-333333333333` |
+| Afiliaciones seguridad social | `44444444-4444-4444-8444-444444444444` |
+| Extractor de documentos | `55555555-5555-4555-8555-555555555555` |
+
+El aviso de prueba no se guarda. `GET /v2/notificaciones` siempre muestra la URL de ejemplo.
 
 ## Ejemplo
 
 ```bash
-curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/{IdSolicitud}" \
-  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+curl -sS -X GET "https://apis.ecorpa.com/v2/consulta/seguridad_social/11111111-1111-4111-8111-111111111111" \
+  -H "Authorization: Bearer ecorpa_test_xxxxxxxx"
 ```
 
 ## Scopes
