@@ -1,0 +1,88 @@
+openapi: 3.1.0
+info:
+  title: Extractor de documentos
+  version: "1.0.0"
+servers:
+  - url: https://apis.ecorpa.com
+security:
+  - bearerAuth: []
+paths:
+  /extractor-documentos/documento-identidad:
+    post:
+      operationId: enviarDocumentoIdentidad
+      summary: Enviar documento de identidad
+      description: Envía el PDF y recibe un IdSolicitud. En el playground eliges el archivo; la petición lo lleva en base64 dentro de Archivo.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - Documentos
+              properties:
+                Documentos:
+                  type: array
+                  minItems: 1
+                  maxItems: 5
+                  description: PDF a leer. Mínimo 1, máximo 5.
+                  items:
+                    type: object
+                    required:
+                      - Archivo
+                    properties:
+                      Archivo:
+                        type: string
+                        contentMediaType: application/pdf
+                        contentEncoding: base64
+                        description: Eliges el PDF, hasta 2 MB. El playground lo convierte a base64. También acepta el prefijo data:application/pdf;base64,.
+                      Referencia:
+                        type: string
+                        maxLength: 120
+                        description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar el PDF.
+      responses:
+        "200":
+          description: Solicitud recibida.
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  Success:
+                    type: boolean
+                    description: true si la solicitud quedó registrada.
+                  Message:
+                    type: string
+                  Data:
+                    type: object
+                    properties:
+                      IdSolicitud:
+                        type: string
+                        description: UUID para el GET y para el aviso.
+                      Total:
+                        type: integer
+                      Documentos:
+                        type: array
+                        items:
+                          type: object
+                          properties:
+                            Referencia:
+                              type: string
+                            Estado:
+                              type: string
+                              description: En el POST siempre es procesando.
+              example:
+                Success: true
+                Message: Su solicitud fue recibida y está en proceso.
+                Data:
+                  IdSolicitud: f76d9c31-813c-4346-b0ec-f94b9f25a01c
+                  Total: 1
+                  Documentos:
+                    - Referencia: cedula-1
+                      Estado: procesando
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      description: API key con prefijo ecorpa_key_.
