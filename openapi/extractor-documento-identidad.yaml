@@ -7,7 +7,7 @@ servers:
 security:
   - bearerAuth: []
 paths:
-  /extractor-documentos/documento-identidad:
+  /v2/extractor-documentos/documento-identidad:
     post:
       operationId: enviarDocumentoIdentidad
       summary: Enviar documento de identidad
