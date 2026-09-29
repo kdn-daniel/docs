@@ -11,35 +11,25 @@ paths:
     post:
       operationId: enviarDocumentoIdentidad
       summary: Enviar documento de identidad
-      description: Envía el PDF y recibe un IdSolicitud. En el playground eliges el archivo; la petición lo lleva en base64 dentro de Archivo.
+      description: Envía el PDF y recibe un IdSolicitud. En el playground sueltas el archivo. En la integración, el JSON lleva Documentos y Archivo en base64.
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
-                - Documentos
+                - Archivo
               properties:
-                Documentos:
-                  type: array
-                  minItems: 1
-                  maxItems: 5
-                  description: PDF a leer. Mínimo 1, máximo 5.
-                  items:
-                    type: object
-                    required:
-                      - Archivo
-                    properties:
-                      Archivo:
-                        type: string
-                        contentMediaType: application/pdf
-                        contentEncoding: base64
-                        description: Eliges el PDF, hasta 2 MB. El playground lo convierte a base64. También acepta el prefijo data:application/pdf;base64,.
-                      Referencia:
-                        type: string
-                        maxLength: 120
-                        description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar el PDF.
+                Archivo:
+                  type: string
+                  format: binary
+                  contentMediaType: application/pdf
+                  description: PDF de hasta 2 MB.
+                Referencia:
+                  type: string
+                  maxLength: 120
+                  description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar el PDF.
       responses:
         "200":
           description: Solicitud recibida.
