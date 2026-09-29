@@ -25,7 +25,7 @@ curl -sS -X POST "https://apis.ecorpa.com/extractor-documentos/documento-identid
   }'
 ```
 
-`Archivo` es el PDF en base64, hasta 2 MB. Si trae el prefijo `data:application/pdf;base64,`, se ignora. Máximo 5 documentos por solicitud: el PDF pesa y el cuerpo de la petición tiene un tope.
+`Archivo` es el PDF, hasta 2 MB. En la referencia de la API eliges el archivo y el playground lo convierte a base64. En tu integración mandas ese string. Si trae el prefijo `data:application/pdf;base64,`, se ignora. Máximo 5 documentos por solicitud: el PDF pesa y el cuerpo de la petición tiene un tope.
 
 `Referencia` es opcional, hasta 120 caracteres. Vuelve igual en la respuesta para que identifiques cada PDF.
 

@@ -2,59 +2,9 @@
 title: "Enviar documento de identidad"
 sidebarTitle: "Enviar documento"
 description: "POST para enviar uno o varios PDF de cédula y recibir el IdSolicitud."
-api: "POST /extractor-documentos/documento-identidad"
+openapi: "openapi/extractor-documento-identidad.yaml POST /extractor-documentos/documento-identidad"
 ---
 
-Envía el PDF del documento de identidad y recibe un `IdSolicitud`. La extracción y los campos están en [Documento de identidad](/extractor-documentos/documento-identidad).
+Envía el PDF del documento de identidad y recibe un `IdSolicitud`. En el playground eliges el archivo: se convierte a base64 y viaja en `Archivo`. La extracción y los campos están en [Documento de identidad](/extractor-documentos/documento-identidad).
 
 Scope: `extractor_documentos`.
-
-<ParamField body="Documentos" type="object[]" required>
-  PDF a leer. Mínimo 1, máximo 5.
-
-  <Expandable title="documento" defaultOpen="true">
-    <ParamField body="Archivo" type="string" required>
-      PDF en base64, hasta 2 MB. Puede incluir el prefijo `data:application/pdf;base64,`.
-    </ParamField>
-    <ParamField body="Referencia" type="string">
-      Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar el PDF.
-    </ParamField>
-  </Expandable>
-</ParamField>
-
-<ResponseField name="Success" type="boolean">
-  `true` si la solicitud quedó registrada.
-</ResponseField>
-
-<ResponseField name="Data.IdSolicitud" type="string">
-  UUID para el GET y para el aviso.
-</ResponseField>
-
-<ResponseField name="Data.Documentos[].Estado" type="string">
-  En el POST siempre es `procesando`.
-</ResponseField>
-
-<RequestExample>
-```bash Request
-curl -sS -X POST "https://apis.ecorpa.com/extractor-documentos/documento-identidad" \
-  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
-  -H "Content-Type: application/json" \
-  -d '{"Documentos":[{"Referencia":"cedula-1","Archivo":"<base64 del PDF>"}]}'
-```
-</RequestExample>
-
-<ResponseExample>
-```json 200
-{
-  "Success": true,
-  "Message": "Su solicitud fue recibida y está en proceso.",
-  "Data": {
-    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
-    "Total": 1,
-    "Documentos": [
-      { "Referencia": "cedula-1", "Estado": "procesando" }
-    ]
-  }
-}
-```
-</ResponseExample>

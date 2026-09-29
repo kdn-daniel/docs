@@ -210,6 +210,7 @@
     "url": "full",
     "examples": {
       "languages": ["bash", "javascript", "python"]
-    }
+    },
+    "openapi": "openapi/extractor-documento-identidad.yaml"
   }
 }
