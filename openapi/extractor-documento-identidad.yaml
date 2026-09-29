@@ -11,41 +11,32 @@ paths:
     post:
       operationId: enviarDocumentoIdentidad
       summary: Enviar documento de identidad
-      description: Envía de 1 a 5 PDF en Documentos y recibe un IdSolicitud.
+      description: Envía de 1 a 5 PDF y recibe un IdSolicitud. En el playground agregas cada archivo a la lista. En la integración, el JSON lleva Documentos y cada Archivo en base64.
       requestBody:
         required: true
         content:
-          application/json:
+          multipart/form-data:
             schema:
               type: object
               required:
-                - Documentos
+                - Archivo
               properties:
-                Documentos:
+                Archivo:
                   type: array
                   minItems: 1
                   maxItems: 5
                   description: Lista de 1 a 5 PDF. Cada uno pesa máximo 2 MB.
                   items:
-                    type: object
-                    required:
-                      - Archivo
-                    properties:
-                      Archivo:
-                        type: string
-                        contentMediaType: application/pdf
-                        contentEncoding: base64
-                        description: PDF de hasta 2 MB. El playground convierte el archivo a base64.
-                      Referencia:
-                        type: string
-                        maxLength: 120
-                        description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar ese PDF.
-            example:
-              Documentos:
-                - Referencia: cedula-1
-                  Archivo: JVBERi0xLjQK
-                - Referencia: cedula-2
-                  Archivo: JVBERi0xLjQK
+                    type: string
+                    format: binary
+                    contentMediaType: application/pdf
+                Referencia:
+                  type: array
+                  maxItems: 5
+                  description: Una por PDF, en el mismo orden. Hasta 120 caracteres. Opcional.
+                  items:
+                    type: string
+                    maxLength: 120
       responses:
         "200":
           description: Solicitud recibida.
