@@ -1,0 +1,37 @@
+---
+title: "Extractor de documentos"
+sidebarTitle: "Extractor de documentos"
+description: "Extractor de documentos. Documento de identidad extrae la información de la cédula y revisa la calidad de la lectura."
+icon: "scan-text"
+---
+
+Envías el PDF y recibes la información extraída. Cada documento tiene su página.
+
+El `POST` devuelve un `IdSolicitud`. El `GET` devuelve la extracción cuando cada archivo queda en `procesado`. Entre dos `GET` del mismo `IdSolicitud` espera al menos 10 segundos. Si pasas el límite, la respuesta es `429`.
+
+Cuando la extracción termina, el aviso usa la misma [URL](/notificaciones). El campo `Modulo` es `extractor_documentos`.
+
+<CardGroup cols={2}>
+  <Card title="Documento de identidad" icon="id-card" href="/extractor-documentos/documento-identidad">
+    Extracción de la información del documento de identidad.
+  </Card>
+</CardGroup>
+
+<Info>
+  Scope: `extractor_documentos`. Auth en [Autenticación](/authentication).
+</Info>
+
+## Endpoints
+
+| Método | Ruta | Descripción |
+| --- | --- | --- |
+| `POST` | `/extractor-documentos/documento-identidad` | Envía cédulas |
+| `GET` | `/extractor-documentos/documento-identidad/{IdSolicitud}` | Estado y datos de esas cédulas |
+
+```text
+https://apis.ecorpa.com
+```
+
+`IdSolicitud` es un UUID. Si el path no es un UUID válido, la ruta no existe.
+
+Los campos de la respuesta están en [Documento de identidad](/extractor-documentos/documento-identidad).

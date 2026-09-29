@@ -55,7 +55,9 @@
               "afiliaciones-seguridad-social/eps",
               "afiliaciones-seguridad-social/ccf",
               "afiliaciones-seguridad-social/arl",
-              "afiliaciones-seguridad-social/afp"
+              "afiliaciones-seguridad-social/afp",
+              "extractor-documentos",
+              "extractor-documentos/documento-identidad"
             ]
           }
         ]
@@ -95,6 +97,14 @@
             "pages": [
               "api-reference/afiliaciones-seguridad-social/crear",
               "api-reference/afiliaciones-seguridad-social/consultar"
+            ]
+          },
+          {
+            "group": "Extractor de documentos",
+            "icon": "scan-text",
+            "pages": [
+              "api-reference/extractor-documentos/crear",
+              "api-reference/extractor-documentos/consultar"
             ]
           },
           {
