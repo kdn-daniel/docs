@@ -7,6 +7,18 @@ icon: "megaphone"
 
 Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siendo `https://apis.ecorpa.com/v2`.
 
+<Update label="29 de septiembre de 2026" tags={["Auth"]} description="API key de prueba">
+  ## Key de prueba
+
+  Puedes crear una key que empieza por `ecorpa_test_…`. La URL es la misma que en producción.
+
+  - No gasta créditos, no guarda datos y no envía el aviso.
+  - El `POST` responde al instante con un `IdSolicitud` fijo y el estado ya en `procesado`.
+  - El `GET` de ese id devuelve el ejemplo. Otro id responde que no encontró la solicitud.
+
+  Los id fijos están en [Autenticación](/authentication).
+</Update>
+
 <Update label="21 de septiembre de 2026" tags={["Consultas","Antecedentes","Formularios","Afiliaciones"]} description="Aviso al terminar">
   ## Aviso cuando el lote termina
 
