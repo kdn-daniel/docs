@@ -29,6 +29,8 @@ curl -sS -X POST "https://apis.ecorpa.com/extractor-documentos/documento-identid
 
 `Referencia` es opcional, hasta 120 caracteres. Vuelve igual en la respuesta para que identifiques cada PDF.
 
+Cada PDF aceptado descuenta 1 crédito de `extractor_documentos`. Si no hay saldo, el `POST` responde `403` y no crea la solicitud.
+
 ## Response
 
 Cada dato dentro de `Campos` llega así:
