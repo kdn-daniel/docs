@@ -9,10 +9,10 @@ Antes de llamar un servicio, revisa esto:
 
 <Steps>
   <Step title="API Key">
-    Debe empezar por `ecorpa_key_…` y tener los scopes contratados.
+    Producción empieza por `ecorpa_key_…` y gasta créditos. Prueba empieza por `ecorpa_test_…`, no gasta créditos y devuelve el caso de éxito. Las dos necesitan los scopes contratados.
   </Step>
   <Step title="Header">
-    Siempre `Authorization: Bearer ecorpa_key_…`. En `POST`, también `Content-Type: application/json`.
+    Siempre `Authorization: Bearer` con la key. En `POST`, también `Content-Type: application/json`.
   </Step>
   <Step title="URL base">
     ```text
