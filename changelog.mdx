@@ -35,8 +35,8 @@ Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siend
 
   Extrae la información del documento de identidad y revisa la calidad de la lectura.
 
-  - `POST /extractor-documentos/documento-identidad` recibe hasta 5 PDF en base64, de hasta 2 MB cada uno.
-  - `GET /extractor-documentos/documento-identidad/{IdSolicitud}` devuelve los campos del documento, el código DANE cuando se encuentra, el formato y las caras.
+  - `POST /v2/extractor-documentos/documento-identidad` recibe hasta 5 PDF en base64, de hasta 2 MB cada uno.
+  - `GET /v2/extractor-documentos/documento-identidad/{IdSolicitud}` devuelve los campos del documento, el código DANE cuando se encuentra, el formato y las caras.
   - Scope: `extractor_documentos`. El aviso, cuando la extracción termina, usa `Modulo` `extractor_documentos`.
 
   Guía: [Documento de identidad](/extractor-documentos/documento-identidad).

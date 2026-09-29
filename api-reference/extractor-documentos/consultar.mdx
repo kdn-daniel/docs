@@ -2,7 +2,7 @@
 title: "Consultar extracción de documento de identidad"
 sidebarTitle: "Consultar extracción"
 description: "GET de la extracción del documento de identidad: campos, códigos DANE, formato, caras y calidad."
-api: "GET /extractor-documentos/documento-identidad/{IdSolicitud}"
+api: "GET /v2/extractor-documentos/documento-identidad/{IdSolicitud}"
 ---
 
 Devuelve la extracción. Mientras un documento esté en `procesando`, vuelve a consultar. El detalle está en [Documento de identidad](/extractor-documentos/documento-identidad).
@@ -37,7 +37,7 @@ Scope: `extractor_documentos`.
 
 <RequestExample>
 ```bash Request
-curl -sS -X GET "https://apis.ecorpa.com/extractor-documentos/documento-identidad/f76d9c31-813c-4346-b0ec-f94b9f25a01c" \
+curl -sS -X GET "https://apis.ecorpa.com/v2/extractor-documentos/documento-identidad/f76d9c31-813c-4346-b0ec-f94b9f25a01c" \
   -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
 ```
 </RequestExample>
