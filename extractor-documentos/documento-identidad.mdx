@@ -1,0 +1,103 @@
+---
+title: "Documento de identidad"
+sidebarTitle: "Documento de identidad"
+description: "Extracción de la información del documento de identidad, con revisión de calidad, formato y caras del PDF."
+icon: "id-card"
+---
+
+Extrae la información que trae el documento de identidad. También revisa la calidad de esa lectura: si el formato es cédula antigua o cédula actual, y si el PDF trae la cara A y la cara B.
+
+El `POST` devuelve un `IdSolicitud`. El `GET` devuelve la extracción cuando `Estado` queda en `procesado`. Entre dos `GET` del mismo `IdSolicitud` espera al menos 10 segundos.
+
+## Request
+
+```bash
+curl -sS -X POST "https://apis.ecorpa.com/extractor-documentos/documento-identidad" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "Documentos": [
+      {
+        "Referencia": "cedula-1",
+        "Archivo": "<base64 del PDF>"
+      }
+    ]
+  }'
+```
+
+`Archivo` es el PDF en base64, hasta 2 MB. Si trae el prefijo `data:application/pdf;base64,`, se ignora. Máximo 5 documentos por solicitud: el PDF pesa y el cuerpo de la petición tiene un tope.
+
+`Referencia` es opcional, hasta 120 caracteres. Vuelve igual en la respuesta para que identifiques cada PDF.
+
+## Response
+
+Cada dato dentro de `Campos` llega así:
+
+```json
+{ "Valor": "", "Confianza": 0, "Fuente": "" }
+```
+
+`Confianza` va de 0 a 100. `Fuente` indica la cara de donde se leyó, por ejemplo `cara_a` o `cara_b`.
+
+| Campo | Contenido |
+| --- | --- |
+| `TipoIdentificacion` | Tipo de documento, por ejemplo `CC` |
+| `NumeroIdentificacion` | Número de identificación |
+| `PrimerNombre` | Primer nombre |
+| `SegundoNombre` | Segundo nombre |
+| `PrimerApellido` | Primer apellido |
+| `SegundoApellido` | Segundo apellido |
+| `FechaNacimiento` | Fecha de nacimiento |
+| `DepartamentoNacimiento` | Nombre del departamento de nacimiento |
+| `CiudadNacimiento` | Nombre de la ciudad de nacimiento |
+| `Genero` | Género |
+| `FechaExpedicion` | Fecha de expedición |
+| `CiudadExpedicion` | Nombre de la ciudad de expedición |
+
+Junto al nombre del lugar, `CodigosDane` trae el código DANE cuando se encuentra:
+
+| Código | Lugar |
+| --- | --- |
+| `DepartamentoNacimiento` | Departamento de nacimiento |
+| `Nacimiento` | Ciudad de nacimiento |
+| `Expedicion` | Ciudad de expedición |
+
+Si un código no se encuentra, esa clave no viene.
+
+`Caras` dice si el PDF trae cada cara: `CaraA` y `CaraB`. `CedulaAntigua` y `CedulaActual` dicen el formato. `Formato` es `cedula_antigua`, `cedula_actual` o `no_aplica`.
+
+`Calidad` trae `Puntaje`, `Nivel` y `Problemas` de la revisión.
+
+```json
+{
+  "Referencia": "cedula-1",
+  "Estado": "procesado",
+  "EsDocumentoIdentidad": true,
+  "Formato": "cedula_actual",
+  "CedulaAntigua": false,
+  "CedulaActual": true,
+  "Caras": { "CaraA": true, "CaraB": true },
+  "CodigosDane": {
+    "DepartamentoNacimiento": "11",
+    "Nacimiento": "11001",
+    "Expedicion": "11001"
+  },
+  "Campos": {
+    "TipoIdentificacion": { "Valor": "CC", "Confianza": 99, "Fuente": "cara_a" },
+    "NumeroIdentificacion": { "Valor": "1234567890", "Confianza": 99, "Fuente": "cara_a" },
+    "PrimerNombre": { "Valor": "Ana", "Confianza": 98, "Fuente": "cara_a" },
+    "SegundoNombre": { "Valor": "Maria", "Confianza": 90, "Fuente": "cara_a" },
+    "PrimerApellido": { "Valor": "Perez", "Confianza": 98, "Fuente": "cara_a" },
+    "SegundoApellido": { "Valor": "Gomez", "Confianza": 95, "Fuente": "cara_a" },
+    "FechaNacimiento": { "Valor": "01/02/1990", "Confianza": 96, "Fuente": "cara_a" },
+    "DepartamentoNacimiento": { "Valor": "Bogotá D.C.", "Confianza": 94, "Fuente": "cara_a" },
+    "CiudadNacimiento": { "Valor": "Bogotá", "Confianza": 94, "Fuente": "cara_a" },
+    "Genero": { "Valor": "F", "Confianza": 97, "Fuente": "cara_a" },
+    "FechaExpedicion": { "Valor": "15/03/2010", "Confianza": 96, "Fuente": "cara_b" },
+    "CiudadExpedicion": { "Valor": "Bogotá", "Confianza": 94, "Fuente": "cara_b" }
+  },
+  "Calidad": { "Puntaje": 90, "Nivel": "alta", "Problemas": [] }
+}
+```
+
+Mientras se lee, `Estado` es `procesando`. Si el PDF no se pudo leer, `Estado` es `error` y `Mensaje` dice por qué. Si no es un documento de identidad, `Estado` es `procesado` y `EsDocumentoIdentidad` es `false`.

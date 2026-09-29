@@ -30,7 +30,19 @@ Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siend
   Referencia: [crear consulta](/api-reference/consulta-seguridad-social/crear) y [crear o reprocesar afiliación](/api-reference/afiliaciones-seguridad-social/crear).
 </Update>
 
-<Update label="17 de agosto de 2026" description="Referencia de la API" tags={["Documentación"]}>
+<Update label="25 de agosto de 2026" tags={["Extractor"]} description="Documento de identidad">
+  ## Extractor de documento de identidad
+
+  Extrae la información del documento de identidad y revisa la calidad de la lectura.
+
+  - `POST /extractor-documentos/documento-identidad` recibe hasta 5 PDF en base64, de hasta 2 MB cada uno.
+  - `GET /extractor-documentos/documento-identidad/{IdSolicitud}` devuelve los campos del documento, el código DANE cuando se encuentra, el formato y las caras.
+  - Scope: `extractor_documentos`. El aviso, cuando la extracción termina, usa `Modulo` `extractor_documentos`.
+
+  Guía: [Documento de identidad](/extractor-documentos/documento-identidad).
+</Update>
+
+<Update label="17 de agosto de 2026" tags={["Documentación"]} description="Referencia de la API">
   ## Referencia de la API
 
   Cada endpoint tiene su propia página: método, body, respuesta y un ejemplo a la derecha. Puedes probar la llamada con tu API Key.
@@ -39,6 +51,7 @@ Lo que cambia en las APIs: servicios nuevos, campos y rutas. La base sigue siend
   - [Crear consulta de antecedentes](/api-reference/consulta-antecedentes/crear)
   - [Crear formulario](/api-reference/formularios-afiliacion/crear)
   - [Crear o reprocesar afiliación](/api-reference/afiliaciones-seguridad-social/crear)
+  - [Enviar documento de identidad](/api-reference/extractor-documentos/crear)
 
   La guía de cada servicio (flujo, estados, entidades) sigue en [Documentación](/).
 </Update>

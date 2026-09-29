@@ -1,0 +1,87 @@
+---
+title: "Consultar extracción de documento de identidad"
+sidebarTitle: "Consultar extracción"
+description: "GET de la extracción del documento de identidad: campos, códigos DANE, formato, caras y calidad."
+api: "GET /extractor-documentos/documento-identidad/{IdSolicitud}"
+---
+
+Devuelve la extracción. Mientras un documento esté en `procesando`, vuelve a consultar. El detalle está en [Documento de identidad](/extractor-documentos/documento-identidad).
+
+Scope: `extractor_documentos`.
+
+<ParamField path="IdSolicitud" type="string" required>
+  UUID que devolvió el [POST](/api-reference/extractor-documentos/crear). Si no es un UUID válido, la ruta no existe.
+</ParamField>
+
+<ResponseField name="Data.Documentos[].Estado" type="string">
+  `procesando`, `procesado` o `error`.
+</ResponseField>
+
+<ResponseField name="Data.Documentos[].Campos" type="object">
+  Cada clave trae `Valor`, `Confianza` (0 a 100) y `Fuente`.
+
+  `TipoIdentificacion`, `NumeroIdentificacion`, `PrimerNombre`, `SegundoNombre`, `PrimerApellido`, `SegundoApellido`, `FechaNacimiento`, `DepartamentoNacimiento`, `CiudadNacimiento`, `Genero`, `FechaExpedicion`, `CiudadExpedicion`.
+</ResponseField>
+
+<ResponseField name="Data.Documentos[].CodigosDane" type="object">
+  Código DANE cuando se encuentra: `DepartamentoNacimiento`, `Nacimiento`, `Expedicion`. Si no se encuentra, la clave no viene.
+</ResponseField>
+
+<ResponseField name="Data.Documentos[].Caras" type="object">
+  `CaraA` y `CaraB`. `true` si esa cara está en el PDF.
+</ResponseField>
+
+<ResponseField name="Data.Documentos[].Calidad" type="object">
+  `Puntaje`, `Nivel` y `Problemas`.
+</ResponseField>
+
+<RequestExample>
+```bash Request
+curl -sS -X GET "https://apis.ecorpa.com/extractor-documentos/documento-identidad/f76d9c31-813c-4346-b0ec-f94b9f25a01c" \
+  -H "Authorization: Bearer ecorpa_key_xxxxxxxx"
+```
+</RequestExample>
+
+<ResponseExample>
+```json 200
+{
+  "Success": true,
+  "Message": "Consulta de solicitud recuperada.",
+  "Data": {
+    "IdSolicitud": "f76d9c31-813c-4346-b0ec-f94b9f25a01c",
+    "Total": 1,
+    "Documentos": [
+      {
+        "Referencia": "cedula-1",
+        "Estado": "procesado",
+        "EsDocumentoIdentidad": true,
+        "Formato": "cedula_actual",
+        "CedulaAntigua": false,
+        "CedulaActual": true,
+        "Caras": { "CaraA": true, "CaraB": true },
+        "CodigosDane": {
+          "DepartamentoNacimiento": "11",
+          "Nacimiento": "11001",
+          "Expedicion": "11001"
+        },
+        "Campos": {
+          "TipoIdentificacion": { "Valor": "CC", "Confianza": 99, "Fuente": "cara_a" },
+          "NumeroIdentificacion": { "Valor": "1234567890", "Confianza": 99, "Fuente": "cara_a" },
+          "PrimerNombre": { "Valor": "Ana", "Confianza": 98, "Fuente": "cara_a" },
+          "SegundoNombre": { "Valor": "Maria", "Confianza": 90, "Fuente": "cara_a" },
+          "PrimerApellido": { "Valor": "Perez", "Confianza": 98, "Fuente": "cara_a" },
+          "SegundoApellido": { "Valor": "Gomez", "Confianza": 95, "Fuente": "cara_a" },
+          "FechaNacimiento": { "Valor": "01/02/1990", "Confianza": 96, "Fuente": "cara_a" },
+          "DepartamentoNacimiento": { "Valor": "Bogotá D.C.", "Confianza": 94, "Fuente": "cara_a" },
+          "CiudadNacimiento": { "Valor": "Bogotá", "Confianza": 94, "Fuente": "cara_a" },
+          "Genero": { "Valor": "F", "Confianza": 97, "Fuente": "cara_a" },
+          "FechaExpedicion": { "Valor": "15/03/2010", "Confianza": 96, "Fuente": "cara_b" },
+          "CiudadExpedicion": { "Valor": "Bogotá", "Confianza": 94, "Fuente": "cara_b" }
+        },
+        "Calidad": { "Puntaje": 90, "Nivel": "alta", "Problemas": [] }
+      }
+    ]
+  }
+}
+```
+</ResponseExample>
