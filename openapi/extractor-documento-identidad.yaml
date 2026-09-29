@@ -11,25 +11,41 @@ paths:
     post:
       operationId: enviarDocumentoIdentidad
       summary: Enviar documento de identidad
-      description: Envía el PDF y recibe un IdSolicitud. En el playground sueltas el archivo. En la integración, el JSON lleva Documentos y Archivo en base64.
+      description: Envía de 1 a 5 PDF en Documentos y recibe un IdSolicitud.
       requestBody:
         required: true
         content:
-          multipart/form-data:
+          application/json:
             schema:
               type: object
               required:
-                - Archivo
+                - Documentos
               properties:
-                Archivo:
-                  type: string
-                  format: binary
-                  contentMediaType: application/pdf
-                  description: PDF de hasta 2 MB.
-                Referencia:
-                  type: string
-                  maxLength: 120
-                  description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar el PDF.
+                Documentos:
+                  type: array
+                  minItems: 1
+                  maxItems: 5
+                  description: Lista de 1 a 5 PDF. Cada uno pesa máximo 2 MB.
+                  items:
+                    type: object
+                    required:
+                      - Archivo
+                    properties:
+                      Archivo:
+                        type: string
+                        contentMediaType: application/pdf
+                        contentEncoding: base64
+                        description: PDF de hasta 2 MB. El playground convierte el archivo a base64.
+                      Referencia:
+                        type: string
+                        maxLength: 120
+                        description: Texto tuyo, hasta 120 caracteres. Vuelve en el GET para identificar ese PDF.
+            example:
+              Documentos:
+                - Referencia: cedula-1
+                  Archivo: JVBERi0xLjQK
+                - Referencia: cedula-2
+                  Archivo: JVBERi0xLjQK
       responses:
         "200":
           description: Solicitud recibida.
@@ -66,9 +82,11 @@ paths:
                 Message: Su solicitud fue recibida y está en proceso.
                 Data:
                   IdSolicitud: f76d9c31-813c-4346-b0ec-f94b9f25a01c
-                  Total: 1
+                  Total: 2
                   Documentos:
                     - Referencia: cedula-1
+                      Estado: procesando
+                    - Referencia: cedula-2
                       Estado: procesando
 components:
   securitySchemes:
